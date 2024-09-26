@@ -18,7 +18,7 @@ const TabProduct = ({
       <div className="container">
         <SectionTitle titleText="DAILY DEALS!" positionClass="text-center" />
         <Tab.Container defaultActiveKey="bestSeller">
-          <Nav
+          {/* <Nav
             variant="pills"
             className="product-tab-list pt-30 pb-55 text-center"
           >
@@ -37,9 +37,9 @@ const TabProduct = ({
                 <h4>Sale Items</h4>
               </Nav.Link>
             </Nav.Item>
-          </Nav>
+          </Nav> */}
           <Tab.Content>
-            <Tab.Pane eventKey="newArrival">
+            {/* <Tab.Pane eventKey="newArrival">
               <div className="row">
                 <ProductGrid
                   category={category}
@@ -58,9 +58,9 @@ const TabProduct = ({
                   spaceBottomClass="mb-25"
                 />
               </div>
-            </Tab.Pane>
-            <Tab.Pane eventKey="saleItems">
-              <div className="row">
+            </Tab.Pane> */}
+            {/* <Tab.Pane eventKey="saleItems"> */}
+              <div className="row" style={{marginTop: "50px"}}>
                 <ProductGrid
                   category={category}
                   type="saleItems"
@@ -68,7 +68,7 @@ const TabProduct = ({
                   spaceBottomClass="mb-25"
                 />
               </div>
-            </Tab.Pane>
+            {/* </Tab.Pane> */}
           </Tab.Content>
         </Tab.Container>
       </div>

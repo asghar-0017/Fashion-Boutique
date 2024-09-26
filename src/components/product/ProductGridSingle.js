@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
@@ -7,43 +7,30 @@ import Rating from "./sub-components/ProductRating";
 import ProductModal from "./ProductModal";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
-import axios from "axios"; // Add axios for API request
-import API_CONFIG from "../../config/Api/api";
 
-const ProductGridSingle = ({ currency, spaceBottomClass }) => {
-  const { apiKey } = API_CONFIG;
-  const [products, setProducts] = useState([]); // State to hold product array
+const ProductGridSingle = ({
+  product,
+  currency,
+  cartItem,
+  wishlistItem,
+  compareItem,
+  spaceBottomClass,
+}) => {
   const [modalShow, setModalShow] = useState(false);
+
+  // Adjust the logic here to match the structure of the product data
+  const discountedPrice = product.discountprice; // Assuming discountprice is provided by the API
+  const finalProductPrice = +(product.price * currency.currencyRate).toFixed(2);
+  const finalDiscountedPrice = discountedPrice
+    ? +(discountedPrice * currency.currencyRate).toFixed(2)
+    : null; // Calculate the final discounted price if available
+
   const dispatch = useDispatch();
-
-  // Fetch product data from API
-  useEffect(() => {
-    axios
-      .get(`${apiKey}/get-product`) // Call the API
-      .then((response) => {
-        setProducts(response.data.data); // Set product data from response (array)
-      })
-      .catch((error) => {
-        console.error("There was an error fetching the products!", error);
-      });
-  }, []);
-
-  if (!products.length) {
-    return <div>Loading...</div>; // Display loading state until product data is fetched
-  }
 
   return (
     <Fragment>
-      {products.map((product) => {
-        const discountedPrice = product.discountprice;
-        const finalProductPrice = +(product.price * currency.currencyRate).toFixed(2);
-        const finalDiscountedPrice = discountedPrice
-          ? +(discountedPrice * currency.currencyRate).toFixed(2)
-          : null;
-
-        return (
-          <div key={product._id} className={clsx("product-wrap", spaceBottomClass)}>
-            <div className="product-img">
+      <div className={clsx("product-wrap", spaceBottomClass)}>
+      <div className="product-img">
               <Link to={process.env.PUBLIC_URL + "/product/" + product._id}>
                 <img
                   className="default-img"
@@ -63,7 +50,6 @@ const ProductGridSingle = ({ currency, spaceBottomClass }) => {
               ) : (
                 ""
               )}
-
               <div className="product-action">
                 <div className="pro-same-action pro-wishlist">
                   <button
@@ -112,29 +98,31 @@ const ProductGridSingle = ({ currency, spaceBottomClass }) => {
                 )}
               </div>
             </div>
-            {/* product modal */}
-            <ProductModal
-              show={modalShow}
-              onHide={() => setModalShow(false)}
-              product={product}
-              currency={currency}
-              discountedPrice={discountedPrice}
-              finalProductPrice={finalProductPrice}
-              finalDiscountedPrice={finalDiscountedPrice}
-            />
-          </div>
-        );
-      })}
+      {/* product modal */}
+      <ProductModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        product={product}
+        currency={currency}
+        discountedPrice={discountedPrice}
+        finalProductPrice={finalProductPrice}
+        finalDiscountedPrice={finalDiscountedPrice}
+        wishlistItem={wishlistItem}
+        compareItem={compareItem}
+      />
+            </div>
+
     </Fragment>
   );
 };
 
 ProductGridSingle.propTypes = {
-  currency: PropTypes.shape({
-    currencyRate: PropTypes.number,
-    currencySymbol: PropTypes.string
-  }),
-  spaceBottomClass: PropTypes.string
+  cartItem: PropTypes.shape({}),
+  compareItem: PropTypes.shape({}),
+  wishlistItem: PropTypes.shape({}),
+  currency: PropTypes.shape({}),
+  product: PropTypes.shape({}),
+  spaceBottomClass: PropTypes.string,
 };
 
 export default ProductGridSingle;
