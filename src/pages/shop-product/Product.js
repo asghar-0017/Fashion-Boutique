@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react"; 
+import React, { Fragment, useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import axios from "axios"; // Import axios
 import SEO from "../../components/seo";
@@ -12,26 +12,40 @@ const Product = () => {
   let { pathname } = useLocation();
   let { id } = useParams();
   
-  const [product, setProduct] = useState(null); // Local state to store the product data
-
-  // Fetch the specific product details from the API
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/get-cart/${id}`);
-        setProduct(response.data.data); // Set the product data to state
-        console.log(response.data.data);
+        setLoading(true);
+        const response = await axios.get(`http://192.168.18.118:3001/get-product/${id}`);
+        
+        if (response.status === 200 && response.data.data) {
+          setProduct(response.data.data); 
+        } else {
+          setError("Product data not found or invalid response");
+        }
       } catch (error) {
-        console.error("Error fetching product:", error);
+        setError("Error fetching product data");
+      } finally {
+        setLoading(false); 
       }
     };
     
     fetchProduct();
-  }, [id]); // Fetch product when the 'id' changes
+  }, [id]);
 
-  // If product data is not yet loaded, return a loading indicator
-  if (!product) {
+  if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!product) {
+    return <div>No product data available</div>;
   }
 
   return (
@@ -42,7 +56,6 @@ const Product = () => {
       />
 
       <LayoutOne headerTop="visible">
-        {/* breadcrumb */}
         <Breadcrumb 
           pages={[
             { label: "Home", path: process.env.PUBLIC_URL + "/" },
@@ -50,20 +63,18 @@ const Product = () => {
           ]}
         />
 
-        {/* product description with image */}
         <ProductImageDescription
           spaceTopClass="pt-100"
           spaceBottomClass="pb-100"
           product={product}
         />
 
-        {/* product description tab */}
         <ProductDescriptionTab
           spaceBottomClass="pb-90"
-          productFullDesc={product.Description}
-          product={product}
+          product={product} 
         />
 
+        {/* Uncomment below if you need a related product slider */}
         {/* related product slider */}
         {/* <RelatedProductSlider
           spaceBottomClass="pb-95"

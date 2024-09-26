@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getProductCartQuantity } from "../../helpers/product";
 import Rating from "./sub-components/ProductRating";
@@ -19,6 +19,7 @@ const ProductDescriptionInfo = ({
   compareItem,
 }) => {
   const dispatch = useDispatch();
+  const navigate=useNavigate()
 
   // Set default color and size from product API data, assuming 'variation' exists.
   const [selectedProductColor, setSelectedProductColor] = useState(
@@ -67,7 +68,7 @@ const ProductDescriptionInfo = ({
       )}
       
       <div className="pro-details-list">
-        <p>{product.shortDescription}</p>
+        <p>{product.description}</p>
       </div>
 
       {product.variations && product.variations.length > 0 ? (
@@ -193,7 +194,7 @@ const ProductDescriptionInfo = ({
                 Add To Cart
               </button>
             ) : (
-              <button disabled>Out of Stock</button>
+              <button onClick={()=>navigate('/checkout')}>Buy Now</button>
             )}
           </div>
 

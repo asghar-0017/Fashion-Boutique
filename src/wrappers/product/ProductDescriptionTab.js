@@ -11,50 +11,54 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
     name: "",
     email: "",
     message: "",
-    rating: 5
+    rating: 5, 
   });
+  const [isLoading, setIsLoading] = useState(true); 
+  const [error, setError] = useState(null); 
 
-  // Fetch reviews on component mount
   useEffect(() => {
-    axios
-      .get(`/get-reviews/${product._id}`)
-      .then((response) => {
-        setReviews(response.data);
-      })
-      .catch((error) => {
+    const fetchReviews = async () => {
+      try {
+        const response = await axios.get(
+          `http://192.168.18.118:3001/get-reviews/${product._id}`
+        );
+        console.log("Fetched Reviews:", response);
+        setReviews(response.data.data || []); 
+      } catch (error) {
         console.error("Failed to fetch reviews:", error);
-      });
+        setError("Failed to load reviews. Please try again.");
+      } finally {
+        setIsLoading(false); 
+      }
+    };
+
+    fetchReviews();
   }, [product._id]);
 
-  // Handle form submission
-// Handle form submission
-// Handle form submission
-const handleSubmitReview = (e) => {
-  e.preventDefault();
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
 
-  // Prepare the review data based on the ReviewSchema
-  const reviewData = {
-    name: newReview.name,
-    email: newReview.email,
-    rating: newReview.rating,
-    reviewMessage: newReview.message,  // Use 'reviewMessage' to match the schema
-    productId: product._id  // Include productId as product._id
-  };
+    const reviewData = {
+      name: newReview.name,
+      email: newReview.email,
+      rating: newReview.rating,
+      reviewMessage: newReview.message, 
+      productId: product._id, 
+    };
 
-  axios
-    .post(`/create-review/${product._id}`, reviewData)
-    .then((response) => {
-      // Refresh reviews list by appending the new review
-      setReviews((prevReviews) => [...prevReviews, response.data]);
-      // Reset the form
-      setNewReview({ name: "", email: "", message: "", rating: 5 });
-    })
-    .catch((error) => {
+    try {
+      const response = await axios.post(
+        `http://192.168.18.118:3001/create-review/${product._id}`,
+        reviewData
+      );
+      setReviews((prevReviews) => [...prevReviews, response.data.data]);
+      setNewReview({ name: "", email: "", message: "", rating: 1 }); 
+      console.log("Submitted Review:", response);
+    } catch (error) {
       console.error("Failed to submit review:", error);
-    });
-};
-
-
+      alert("Failed to submit review. Please try again."); 
+    }
+  };
 
   return (
     <div className={clsx("description-review-area", spaceBottomClass)}>
@@ -90,46 +94,50 @@ const handleSubmitReview = (e) => {
                       <span>Materials</span> 60% cotton, 40% polyester
                     </li>
                     <li>
-                      <span>Other Info</span> American heirloom jean shorts pug seitan letterpress
+                      <span>Other Info</span> American heirloom jean shorts pug
+                      seitan letterpress
                     </li>
                   </ul>
                 </div>
               </Tab.Pane>
               <Tab.Pane eventKey="productDescription">
-                {product.fullDesc}
+                <p>{product.description}</p>
               </Tab.Pane>
               <Tab.Pane eventKey="productReviews">
                 <div className="row">
                   <div className="col-lg-7">
                     <div className="review-wrapper">
-                      {reviews.length > 0 ? (
-                        reviews.map((review, index) => (
-                          <div key={index} className="single-review">
-                            <div className="review-img">
-                              <img
-                                src={review.imageUrl || "/assets/img/testimonial/default.jpg"}
-                                alt="reviewer"
-                              />
-                            </div>
-                            <div className="review-content">
-                              <div className="review-top-wrap">
-                                <div className="review-left">
-                                  <div className="review-name">
-                                    <h4>{review.name}</h4>
-                                  </div>
-                                  <div className="review-rating">
-                                    {[...Array(review.rating)].map((_, i) => (
-                                      <i key={i} className="fa fa-star" />
-                                    ))}
+                      {isLoading ? (
+                        <p>Loading reviews...</p>
+                      ) : error ? (
+                        <p>{error}</p>
+                      ) : reviews.length > 0 ? (
+                        reviews.map((review, index) => {
+                          if (!review || !review.name) {
+                            return null; 
+                          }
+                          return (
+                            <div key={index} className="single-review">
+                              <div className="review-content">
+                                <div className="review-top-wrap">
+                                  <div className="review-left">
+                                    <div className="review-name">
+                                      <h4>{review.name}</h4>
+                                    </div>
+                                    <div className="review-rating">
+                                      {[...Array(Math.round(review.rating || 0))].map((_, i) => (
+                                        <i key={i} className="fa fa-star" />
+                                      ))}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div className="review-bottom">
-                                <p>{review.message}</p>
+                                <div className="review-bottom">
+                                  <p>{review.reviewMessage || "No message provided"}</p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))
+                          );
+                        })
                       ) : (
                         <p>No reviews yet.</p>
                       )}
@@ -140,18 +148,27 @@ const handleSubmitReview = (e) => {
                       <h3>Add a Review</h3>
                       <div className="ratting-form">
                         <form onSubmit={handleSubmitReview}>
-                          <div className="star-box">
-                            <span>Your rating:</span>
-                            <div className="ratting-star">
-                              {[...Array(5)].map((_, i) => (
-                                <i
-                                  key={i}
-                                  className={`fa fa-star ${i < newReview.rating ? "selected" : ""}`}
-                                  onClick={() => setNewReview({ ...newReview, rating: i + 1 })}
-                                />
-                              ))}
-                            </div>
-                          </div>
+                        <div className="star-box">
+                        <span>Your rating:</span>
+                        <div className="ratting-star">
+                          {[...Array(5)].map((_, i) => (
+                            <i
+                              key={i}
+                              className={`fa fa-star ${i < newReview.rating ? "selected" : ""}`}
+                              style={{
+                                cursor: "pointer",
+                                color: i < newReview.rating ? "#FFD700" : "#ccc", 
+                              }}
+                              onClick={() =>
+                                setNewReview({
+                                  ...newReview,
+                                  rating: i + 1,
+                                })
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
                           <div className="row">
                             <div className="col-md-6">
                               <div className="rating-form-style mb-10">
@@ -159,7 +176,12 @@ const handleSubmitReview = (e) => {
                                   placeholder="Name"
                                   type="text"
                                   value={newReview.name}
-                                  onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
+                                  onChange={(e) =>
+                                    setNewReview({
+                                      ...newReview,
+                                      name: e.target.value,
+                                    })
+                                  }
                                   required
                                 />
                               </div>
@@ -170,7 +192,12 @@ const handleSubmitReview = (e) => {
                                   placeholder="Email"
                                   type="email"
                                   value={newReview.email}
-                                  onChange={(e) => setNewReview({ ...newReview, email: e.target.value })}
+                                  onChange={(e) =>
+                                    setNewReview({
+                                      ...newReview,
+                                      email: e.target.value,
+                                    })
+                                  }
                                   required
                                 />
                               </div>
@@ -180,7 +207,12 @@ const handleSubmitReview = (e) => {
                                 <textarea
                                   placeholder="Message"
                                   value={newReview.message}
-                                  onChange={(e) => setNewReview({ ...newReview, message: e.target.value })}
+                                  onChange={(e) =>
+                                    setNewReview({
+                                      ...newReview,
+                                      message: e.target.value,
+                                    })
+                                  }
                                   required
                                 />
                                 <input type="submit" value="Submit" />
@@ -203,7 +235,7 @@ const handleSubmitReview = (e) => {
 
 ProductDescriptionTab.propTypes = {
   product: PropTypes.object.isRequired,
-  spaceBottomClass: PropTypes.string
+  spaceBottomClass: PropTypes.string,
 };
 
 export default ProductDescriptionTab;
