@@ -8,8 +8,10 @@ import ProductModal from "./ProductModal";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
 import axios from "axios"; // Add axios for API request
+import API_CONFIG from "../../config/Api/api";
 
 const ProductGridSingle = ({ currency, spaceBottomClass }) => {
+  const { apiKey } = API_CONFIG;
   const [products, setProducts] = useState([]); // State to hold product array
   const [modalShow, setModalShow] = useState(false);
   const dispatch = useDispatch();
@@ -17,7 +19,7 @@ const ProductGridSingle = ({ currency, spaceBottomClass }) => {
   // Fetch product data from API
   useEffect(() => {
     axios
-      .get("http://localhost:3001/get-product") // Call the API
+      .get(`${apiKey}/get-product`) // Call the API
       .then((response) => {
         setProducts(response.data.data); // Set product data from response (array)
       })
