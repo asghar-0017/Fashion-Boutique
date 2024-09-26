@@ -14,7 +14,7 @@ const MenuCart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/get-cart");
+        const response = await axios.get("http://192.168.18.118:3001/get-cart");
         console.log("Cart data from API:", response.data.data);
         setCartItems(response.data.data); // Assuming response.data.data holds cart items
       } catch (error) {

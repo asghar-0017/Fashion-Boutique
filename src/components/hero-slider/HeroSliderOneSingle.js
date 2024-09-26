@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 
 import { Link } from "react-router-dom";
+import image from '../../assets/scss/image.png'
 
 const HeroSliderOneSingle = ({ data }) => {
   return (
@@ -14,7 +15,7 @@ const HeroSliderOneSingle = ({ data }) => {
               <div className="slider-btn btn-hover">
                 <Link
                   className="animated"
-                  to={process.env.PUBLIC_URL + data.url}
+                  to={process.env.PUBLIC_URL + "/shop-grid-no-sidebar"}
                 >
                   SHOP NOW
                 </Link>
@@ -25,7 +26,7 @@ const HeroSliderOneSingle = ({ data }) => {
             <div className="slider-single-img slider-animated-1">
               <img
                 className="animated img-fluid"
-                src={process.env.PUBLIC_URL + data.image}
+                src={image}
                 alt=""
               />
             </div>
