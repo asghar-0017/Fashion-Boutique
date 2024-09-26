@@ -98,6 +98,8 @@ const ProductGridSingle = ({
                 )}
               </div>
             </div>
+            </div>
+
       {/* product modal */}
       <ProductModal
         show={modalShow}
@@ -110,7 +112,6 @@ const ProductGridSingle = ({
         wishlistItem={wishlistItem}
         compareItem={compareItem}
       />
-            </div>
 
     </Fragment>
   );
