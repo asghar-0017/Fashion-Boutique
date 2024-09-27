@@ -33,14 +33,13 @@ const ProductGridListSingle = ({
             <Link to={process.env.PUBLIC_URL + "/product/" + product.id}>
               <img
                 className="default-img"
-                src={process.env.PUBLIC_URL + product.image[0]}
-                alt=""
+                // src={process.env.PUBLIC_URL + product.Imageurl}
               />
               {product.image.length > 1 ? (
                 <img
                   className="hover-img"
-                  src={process.env.PUBLIC_URL + product.image[1]}
-                  alt=""
+                  // src={process.env.PUBLIC_URL + product.Imageurl}
+                  // alt=""
                 />
               ) : (
                 ""

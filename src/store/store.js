@@ -9,21 +9,23 @@ import {
     PURGE,
     REGISTER,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import storage from "redux-persist/lib/storage"; // default storage (localStorage)
 import productReducer from './slices/product-slice';
 import currencyReducer from "./slices/currency-slice";
 import cartReducer from "./slices/cart-slice";
 import compareReducer from "./slices/compare-slice";
 import wishlistReducer from "./slices/wishlist-slice";
 
+// Redux Persist Configuration
 const persistConfig = {
-    key: "flone",
-    version: 1.1,
-    storage,
-    blacklist: ["product"]
-}
+    key: "flone",  // Key for storing data in localStorage
+    version: 1.1,  // Versioning your persisted store
+    storage,       // The storage engine (localStorage here)
+    blacklist: ["product"],  // Don't persist the product slice
+};
 
-export const rootReducer = combineReducers({
+// Combine all reducers
+const rootReducer = combineReducers({
     product: productReducer,
     currency: currencyReducer,
     cart: cartReducer,
@@ -31,13 +33,16 @@ export const rootReducer = combineReducers({
     wishlist: wishlistReducer
 });
 
+// Apply persistence to the root reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+// Create and configure the store
 export const store = configureStore({
-    reducer: persistedReducer,
+    reducer: persistedReducer, // Apply the persisted reducer to the store
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
+                // Ignore redux-persist actions in serializable checks
                 ignoredActions: [
                     FLUSH,
                     REHYDRATE,
@@ -50,4 +55,5 @@ export const store = configureStore({
         }),
 });
 
+// Create the persisted store
 export const persistor = persistStore(store);
