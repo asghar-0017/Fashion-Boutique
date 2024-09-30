@@ -1,12 +1,54 @@
-import { Fragment } from "react"; 
+import { Fragment, useState } from "react"; 
 import { useLocation } from "react-router-dom";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import GoogleMap from "../../components/google-map"
+import axios from "axios"; // Import axios
 
 const Contact = () => {
   let { pathname } = useLocation();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  // State to store response message
+  const [responseMessage, setResponseMessage] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Simple form validation (optional)
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setResponseMessage("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      const response = await axios.post('https://e-commerce-lime-omega.vercel.app/create-contact', formData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        setResponseMessage('Thank you for contacting us!');
+        setFormData({ name: "", email: "", subject: "", message: "" }); // Clear form
+      } else {
+        setResponseMessage('Failed to send your message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending contact form:', error);
+      setResponseMessage('An error occurred. Please try again later.');
+    }
+  };
 
   return (
     <Fragment>
@@ -24,9 +66,10 @@ const Contact = () => {
         />
         <div className="contact-area pt-100 pb-100">
           <div className="container">
-            <div className="contact-map mb-10">
+            {/* Commenting out Google Map */}
+            {/* <div className="contact-map mb-10">
               <GoogleMap lat={47.444} lng={-122.176} />
-            </div>
+            </div> */}
             <div className="custom-row-2">
               <div className="col-12 col-lg-4 col-md-5">
                 <div className="contact-info-wrap">
@@ -102,19 +145,26 @@ const Contact = () => {
                   <div className="contact-title mb-30">
                     <h2>Get In Touch</h2>
                   </div>
-                  <form className="contact-form-style">
+                  <form className="contact-form-style" onSubmit={handleSubmit}>
                     <div className="row">
                       <div className="col-lg-6">
-                        <input name="name" placeholder="Name*" type="text" />
+                        <input name="name" placeholder="Name*" type="text"  value={formData.name}
+                          onChange={handleChange}
+                          required />
                       </div>
                       <div className="col-lg-6">
-                        <input name="email" placeholder="Email*" type="email" />
+                        <input name="email" placeholder="Email*" type="email" value={formData.email}
+                          onChange={handleChange}
+                          required />
                       </div>
                       <div className="col-lg-12">
                         <input
                           name="subject"
                           placeholder="Subject*"
                           type="text"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          required
                         />
                       </div>
                       <div className="col-lg-12">
@@ -122,6 +172,9 @@ const Contact = () => {
                           name="message"
                           placeholder="Your Message*"
                           defaultValue={""}
+                          value={formData.message}
+                          onChange={handleChange}
+                          required
                         />
                         <button className="submit" type="submit">
                           SEND
@@ -129,7 +182,7 @@ const Contact = () => {
                       </div>
                     </div>
                   </form>
-                  <p className="form-message" />
+                  <p className="form-message">{responseMessage}</p>
                 </div>
               </div>
             </div>
