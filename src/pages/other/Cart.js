@@ -32,7 +32,7 @@ const Cart = () => {
           )
         : null;
 
-      const itemQuantity = cartItem.Quantity || 0; // Ensure quantity is valid
+      const itemQuantity = cartItem.Quantity || 1; // Ensure quantity is valid
 
       total += finalDiscountedPrice
         ? finalDiscountedPrice * itemQuantity
@@ -87,7 +87,7 @@ const Cart = () => {
                                 )
                               : null;
 
-                            const itemQuantity = cartItem.Quantity || 0; // Ensure quantity is valid
+                            const itemQuantity = cartItem.Quantity || 1; // Ensure quantity is valid
 
                             return (
                               <tr key={key}>

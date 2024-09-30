@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { getDiscountPrice } from "../../helpers/product";
@@ -6,17 +6,16 @@ import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { addToCart } from "../../store/slices/cart-slice";
-import { deleteFromWishlist, deleteAllFromWishlist } from "../../store/slices/wishlist-slice"
+import { deleteFromWishlist, deleteAllFromWishlist } from "../../store/slices/wishlist-slice";
 
 const Wishlist = () => {
   const dispatch = useDispatch();
-  let { pathname } = useLocation();
+  const { pathname } = useLocation();
   
   const currency = useSelector((state) => state.currency);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
   
-
   return (
     <Fragment>
       <SEO
@@ -24,16 +23,16 @@ const Wishlist = () => {
         description="Wishlist page of flone react minimalist eCommerce template."
       />
       <LayoutOne headerTop="visible">
-        {/* breadcrumb */}
+        {/* Breadcrumb */}
         <Breadcrumb 
           pages={[
-            {label: "Home", path: process.env.PUBLIC_URL + "/" },
-            {label: "Wishlist", path: process.env.PUBLIC_URL + pathname }
+            { label: "Home", path: process.env.PUBLIC_URL + "/" },
+            { label: "Wishlist", path: process.env.PUBLIC_URL + pathname }
           ]} 
         />
         <div className="cart-main-area pt-90 pb-100">
           <div className="container">
-            {wishlistItems && wishlistItems.length >= 1 ? (
+            {wishlistItems && wishlistItems.length > 0 ? (
               <Fragment>
                 <h3 className="cart-page-title">Your wishlist items</h3>
                 <div className="row">
@@ -46,11 +45,11 @@ const Wishlist = () => {
                             <th>Product Name</th>
                             <th>Unit Price</th>
                             <th>Add To Cart</th>
-                            <th>action</th>
+                            <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {wishlistItems.map((wishlistItem, key) => {
+                          {wishlistItems.map((wishlistItem) => {
                             const discountedPrice = getDiscountPrice(
                               wishlistItem.price,
                               wishlistItem.discount
@@ -64,34 +63,28 @@ const Wishlist = () => {
                             const cartItem = cartItems.find(
                               item => item.id === wishlistItem.id
                             );
+
                             return (
-                              <tr key={key}>
+                              <tr key={wishlistItem.id}>
                                 <td className="product-thumbnail">
                                   <Link
-                                    to={
-                                      process.env.PUBLIC_URL +
-                                      "/product/" +
-                                      wishlistItem.id
-                                    }
+                                    to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
                                   >
-                                    <img
-                                      className="img-fluid"
-                                      src={
-                                        process.env.PUBLIC_URL +
-                                        wishlistItem.image[0]
-                                      }
-                                      alt=""
-                                    />
+                                    {wishlistItem.image && wishlistItem.image.length > 0 ? (
+                                      <img
+                                        className="img-fluid"
+                                        src={`${process.env.PUBLIC_URL}${wishlistItem.Imageurl}`}
+                                        alt={wishlistItem.name}
+                                      />
+                                    ) : (
+                                      <span>No image available</span>
+                                    )}
                                   </Link>
                                 </td>
 
                                 <td className="product-name text-center">
                                   <Link
-                                    to={
-                                      process.env.PUBLIC_URL +
-                                      "/product/" +
-                                      wishlistItem.id
-                                    }
+                                    to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
                                   >
                                     {wishlistItem.name}
                                   </Link>
@@ -101,18 +94,15 @@ const Wishlist = () => {
                                   {discountedPrice !== null ? (
                                     <Fragment>
                                       <span className="amount old">
-                                        {currency.currencySymbol +
-                                          finalProductPrice}
+                                        {currency.currencySymbol + finalProductPrice}
                                       </span>
                                       <span className="amount">
-                                        {currency.currencySymbol +
-                                          finalDiscountedPrice}
+                                        {currency.currencySymbol + finalDiscountedPrice}
                                       </span>
                                     </Fragment>
                                   ) : (
                                     <span className="amount">
-                                      {currency.currencySymbol +
-                                        finalProductPrice}
+                                      {currency.currencySymbol + finalProductPrice}
                                     </span>
                                   )}
                                 </td>
@@ -124,45 +114,25 @@ const Wishlist = () => {
                                       rel="noopener noreferrer"
                                       target="_blank"
                                     >
-                                      {" "}
-                                      Buy now{" "}
+                                      Buy now
                                     </a>
-                                  ) : wishlistItem.variation &&
-                                    wishlistItem.variation.length >= 1 ? (
+                                  ) : wishlistItem.variation && wishlistItem.variation.length > 0 ? (
                                     <Link
                                       to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
                                     >
                                       Select option
                                     </Link>
-                                  ) : wishlistItem.stock &&
-                                    wishlistItem.stock > 0 ? (
+                                  ) : wishlistItem.stock && wishlistItem.stock > 0 ? (
                                     <button
-                                      onClick={() =>
-                                        dispatch(addToCart(wishlistItem))
-                                      }
-                                      className={
-                                        cartItem !== undefined &&
-                                        cartItem.quantity > 0
-                                          ? "active"
-                                          : ""
-                                      }
-                                      disabled={
-                                        cartItem !== undefined &&
-                                        cartItem.quantity > 0
-                                      }
-                                      title={
-                                        wishlistItem !== undefined
-                                          ? "Added to cart"
-                                          : "Add to cart"
-                                      }
+                                      onClick={() => dispatch(addToCart(wishlistItem))}
+                                      className={cartItem?.quantity > 0 ? "active" : ""}
+                                      disabled={cartItem?.quantity > 0}
+                                      title={wishlistItem ? "Add to cart" : "Added to cart"}
                                     >
-                                      {cartItem !== undefined &&
-                                      cartItem.quantity > 0
-                                        ? "Added"
-                                        : "Add to cart"}
+                                      {cartItem?.quantity > 0 ? "Added" : "Add to cart"}
                                     </button>
                                   ) : (
-                                    <button disabled className="active">
+                                    <button className="active">
                                       Out of stock
                                     </button>
                                   )}
@@ -170,9 +140,7 @@ const Wishlist = () => {
 
                                 <td className="product-remove">
                                   <button
-                                    onClick={() =>
-                                      dispatch(deleteFromWishlist(wishlistItem.id))
-                                    }
+                                    onClick={() => dispatch(deleteFromWishlist(wishlistItem.id))}
                                   >
                                     <i className="fa fa-times"></i>
                                   </button>
@@ -188,11 +156,9 @@ const Wishlist = () => {
 
                 <div className="row">
                   <div className="col-lg-12">
-                    <div className="cart-shiping-update-wrapper">
-                      <div className="cart-shiping-update">
-                        <Link
-                          to={process.env.PUBLIC_URL + "/shop-grid-standard"}
-                        >
+                    <div className="cart-shipping-update-wrapper">
+                      <div className="cart-shipping-update">
+                        <Link to={`${process.env.PUBLIC_URL}/shop-grid-standard`}>
                           Continue Shopping
                         </Link>
                       </div>
@@ -213,8 +179,8 @@ const Wishlist = () => {
                       <i className="pe-7s-like"></i>
                     </div>
                     <div className="item-empty-area__text">
-                      No items found in wishlist <br />{" "}
-                      <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
+                      No items found in wishlist <br />
+                      <Link to={`${process.env.PUBLIC_URL}/shop-grid-standard`}>
                         Add Items
                       </Link>
                     </div>
