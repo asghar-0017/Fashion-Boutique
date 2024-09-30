@@ -21,7 +21,7 @@ const IconGroup = ({ iconWhiteClass }) => {
 
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)} >
-      <div className="same-style header-search d-none d-lg-block">
+      {/* <div className="same-style header-search d-none d-lg-block">
         <button className="search-active" onClick={e => handleClick(e)}>
           <i className="pe-7s-search" />
         </button>
@@ -33,8 +33,8 @@ const IconGroup = ({ iconWhiteClass }) => {
             </button>
           </form>
         </div>
-      </div>
-      <div className="same-style account-setting d-none d-lg-block">
+      </div> */}
+      {/* <div className="same-style account-setting d-none d-lg-block">
         <button
           className="account-setting-active"
           onClick={e => handleClick(e)}
@@ -58,7 +58,7 @@ const IconGroup = ({ iconWhiteClass }) => {
             </li>
           </ul>
         </div>
-      </div>
+      </div> */}
       <div className="same-style header-compare">
         <Link to={process.env.PUBLIC_URL + "/compare"}>
           <i className="pe-7s-shuffle" />
