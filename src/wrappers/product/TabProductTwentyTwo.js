@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import SectionTitle from "../../components/section-title/SectionTitle";
-import ProductGridTwo from "./ProductGridTwo";
+import ProductGridTwo from "./ProductGridTwo"
 
 const TabProductTwentyTwo = ({
   spaceTopClass,
