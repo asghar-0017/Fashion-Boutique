@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import axios from "axios";
+import API_CONFIG from '../../config/Api/api'
 
 const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
   const [reviews, setReviews] = useState([]);
@@ -17,10 +18,12 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
   const [error, setError] = useState(null); 
 
   useEffect(() => {
+    const { apiKey } = API_CONFIG;
+
     const fetchReviews = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.18.118:3001/get-reviews/${product._id}`
+          `${apiKey}/get-reviews/${product._id}`
         );
         console.log("Fetched Reviews:", response);
         setReviews(response.data.data || []); 
@@ -47,8 +50,10 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
     };
 
     try {
+      const { apiKey } = API_CONFIG;
+
       const response = await axios.post(
-        `http://192.168.18.118:3001/create-review/${product._id}`,
+        `${apiKey}/create-review/${product._id}`,
         reviewData
       );
       setReviews((prevReviews) => [...prevReviews, response.data.data]);

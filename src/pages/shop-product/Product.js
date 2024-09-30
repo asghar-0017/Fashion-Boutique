@@ -4,9 +4,10 @@ import axios from "axios"; // Import axios
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import RelatedProductSlider from "../../wrappers/product/RelatedProductSlider";
 import ProductDescriptionTab from "../../wrappers/product/ProductDescriptionTab";
 import ProductImageDescription from "../../wrappers/product/ProductImageDescription";
+import API_CONFIG from "../../config/Api/api";
+
 
 const Product = () => {
   let { pathname } = useLocation();
@@ -16,10 +17,12 @@ const Product = () => {
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null); 
   useEffect(() => {
+    const { apiKey } = API_CONFIG;
+
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://192.168.18.118:3001/get-product/${id}`);
+        const response = await axios.get(`${apiKey}/get-product/${id}`);
         
         if (response.status === 200 && response.data.data) {
           setProduct(response.data.data); 

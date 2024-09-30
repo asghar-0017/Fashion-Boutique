@@ -1,5 +1,5 @@
 const API_CONFIG = {
-    apiKey: `http://192.168.18.118:3001`,
+    apiKey: `https://e-commerce-lime-omega.vercel.app`,
 };
   
 export default API_CONFIG;

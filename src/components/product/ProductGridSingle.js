@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import React, { Fragment, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
@@ -7,6 +7,18 @@ import Rating from "./sub-components/ProductRating";
 import ProductModal from "./ProductModal";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
+
+const calculatePrices = (product, currencyRate) => {
+  const basePrice = product.price * currencyRate;
+  const discountPercentage = product.discountprice || 0;
+  const finalDiscountedPrice = discountPercentage
+    ? basePrice * (1 - discountPercentage / 100)
+    : basePrice;
+  return {
+    basePrice: basePrice.toFixed(2),
+    finalDiscountedPrice: finalDiscountedPrice.toFixed(2),
+  };
+};
 
 const ProductGridSingle = ({
   product,
@@ -17,112 +29,108 @@ const ProductGridSingle = ({
   spaceBottomClass,
 }) => {
   const [modalShow, setModalShow] = useState(false);
-
-  // Adjust the logic here to match the structure of the product data
-  const discountedPrice = product.discountprice; // Assuming discountprice is provided by the API
-  const finalProductPrice = +(product.price * currency.currencyRate).toFixed(2);
-  const finalDiscountedPrice = discountedPrice
-    ? +(discountedPrice * currency.currencyRate).toFixed(2)
-    : null; // Calculate the final discounted price if available
-
   const dispatch = useDispatch();
+
+  // Calculate the prices based on product properties and the current currency rate
+  const { basePrice, finalDiscountedPrice } = calculatePrices(
+    product,
+    currency.currencyRate
+  );
+
+  // Handle add to cart logic with the calculated price details
+  const handleAddToCart = (product) => {
+    dispatch(
+      addToCart({
+        ...product,
+        price: +basePrice, // Use base price
+        discountprice: +finalDiscountedPrice, // Use discounted price if available
+      })
+    );
+  };
 
   return (
     <Fragment>
       <div className={clsx("product-wrap", spaceBottomClass)}>
-      <div className="product-img">
-              <Link to={process.env.PUBLIC_URL + "/product/" + product._id}>
-                <img
-                  className="default-img"
-                  src={product.Imageurl}
-                  alt={product.title}
-                />
-              </Link>
-              {product.sale ? (
-                <div className="product-img-badges">
-                  {product.discountprice ? (
-                    <span className="pink">-{product.discountprice}%</span>
-                  ) : (
-                    ""
-                  )}
-                  {product.sale ? <span className="purple">Sale</span> : ""}
-                </div>
-              ) : (
-                ""
-              )}
-              <div className="product-action">
-                <div className="pro-same-action pro-wishlist">
-                  <button
-                    onClick={() => dispatch(addToWishlist(product))}
-                  >
-                    <i className="pe-7s-like" />
-                  </button>
-                </div>
-                <div className="pro-same-action pro-cart">
-                  <button
-                    onClick={() => dispatch(addToCart(product))}
-                  >
-                    <i className="pe-7s-cart"></i> Add to cart
-                  </button>
-                </div>
-                <div className="pro-same-action pro-quickview">
-                  <button title="Quick View" onClick={() => setModalShow(true)}>
-                    <i className="pe-7s-look" />
-                  </button>
-                </div>
-              </div>
+        <div className="product-img">
+          <Link to={`${process.env.PUBLIC_URL}/product/${product._id}`}>
+            <img
+              className="default-img"
+              src={product.Imageurl}
+              alt={product.title}
+            />
+          </Link>
+          {product.discountprice && (
+            <div className="product-img-badges">
+              <span className="pink">-{product.discountprice}%</span>
+              {product.sale && <span className="purple">Sale</span>}
             </div>
-            <div className="product-content text-center">
-              <h3>
-                <Link to={process.env.PUBLIC_URL + "/product/" + product._id}>
-                  {product.title}
-                </Link>
-              </h3>
-              {product.review && product.review > 0 ? (
-                <div className="product-rating">
-                  <Rating ratingValue={product.review} />
-                </div>
-              ) : (
-                ""
-              )}
-              <div className="product-price">
-                {finalDiscountedPrice !== null ? (
-                  <Fragment>
-                    <span>{currency.currencySymbol + finalDiscountedPrice}</span>{" "}
-                    <span className="old">
-                      {currency.currencySymbol + finalProductPrice}
-                    </span>
-                  </Fragment>
-                ) : (
-                  <span>{currency.currencySymbol + finalProductPrice} </span>
-                )}
-              </div>
+          )}
+          <div className="product-action">
+            <div className="pro-same-action pro-wishlist">
+              <button onClick={() => dispatch(addToWishlist(product))}>
+                <i className="pe-7s-like" />
+              </button>
             </div>
+            <div className="pro-same-action pro-cart">
+              <button onClick={() => handleAddToCart(product)}>
+                <i className="pe-7s-cart"></i> Add to cart
+              </button>
             </div>
+            <div className="pro-same-action pro-quickview">
+              <button title="Quick View" onClick={() => setModalShow(true)}>
+                <i className="pe-7s-look" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="product-content text-center">
+          <h3>
+            <Link to={`${process.env.PUBLIC_URL}/product/${product._id}`}>
+              {product.title}
+            </Link>
+          </h3>
+          {product.review && product.review > 0 && (
+            <div className="product-rating">
+              <Rating ratingValue={product.review} />
+            </div>
+          )}
+          <div className="product-price">
+            {product.discountprice ? (
+              <Fragment>
+                <span>{currency.currencySymbol + finalDiscountedPrice}</span>{" "}
+                <span className="old">
+                  {currency.currencySymbol + basePrice}
+                </span>
+              </Fragment>
+            ) : (
+              <span>{currency.currencySymbol + basePrice}</span>
+            )}
+          </div>
+        </div>
+      </div>
 
-      {/* product modal */}
+      {/* Product modal for quick view */}
       <ProductModal
         show={modalShow}
         onHide={() => setModalShow(false)}
         product={product}
         currency={currency}
-        discountedPrice={discountedPrice}
-        finalProductPrice={finalProductPrice}
-        finalDiscountedPrice={finalDiscountedPrice}
+        discountedPrice={product.discountprice}
+        finalProductPrice={+basePrice}
+        finalDiscountedPrice={+finalDiscountedPrice}
         wishlistItem={wishlistItem}
         compareItem={compareItem}
       />
-
     </Fragment>
   );
 };
 
 ProductGridSingle.propTypes = {
-  cartItem: PropTypes.shape({}),
-  compareItem: PropTypes.shape({}),
-  wishlistItem: PropTypes.shape({}),
-  currency: PropTypes.shape({}),
-  product: PropTypes.shape({}),
+  product: PropTypes.object.isRequired,
+  currency: PropTypes.object.isRequired,
+  cartItem: PropTypes.object,
+  wishlistItem: PropTypes.object,
+  compareItem: PropTypes.object,
   spaceBottomClass: PropTypes.string,
 };
 

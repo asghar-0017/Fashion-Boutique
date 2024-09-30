@@ -7,6 +7,7 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import {
   addToCart,
   decreaseQuantity,
+  incrementQuantity,
   deleteFromCart,
 } from "../../store/slices/cart-slice";
 
@@ -16,29 +17,20 @@ const Cart = () => {
   const currency = useSelector((state) => state.currency);
   const cartItems = useSelector((state) => state.cart.cartItems);
 
-  // State to track cart total price
   const [cartTotalPrice, setCartTotalPrice] = useState(0);
 
-  // Recalculate total price whenever cartItems or currency changes
   useEffect(() => {
-    let total = 0;
-    cartItems.forEach((cartItem) => {
-      const finalProductPrice = parseFloat(
-        (cartItem.price * currency.currencyRate).toFixed(2)
-      );
+    const total = cartItems.reduce((acc, cartItem) => {
+      const finalProductPrice = cartItem.price * currency.currencyRate;
       const finalDiscountedPrice = cartItem.discountprice
-        ? parseFloat(
-            (cartItem.discountprice * currency.currencyRate).toFixed(2)
-          )
-        : null;
+        ? cartItem.discountprice * currency.currencyRate
+        : finalProductPrice;
 
-      const itemQuantity = cartItem.Quantity || 1; // Ensure quantity is valid
+      const itemQuantity = cartItem.Quantity || 1;
+      return acc + finalDiscountedPrice * itemQuantity;
+    }, 0);
 
-      total += finalDiscountedPrice
-        ? finalDiscountedPrice * itemQuantity
-        : finalProductPrice * itemQuantity;
-    });
-    setCartTotalPrice(total); // Update total price state
+    setCartTotalPrice(total);
   }, [cartItems, currency]);
 
   return (
@@ -56,7 +48,7 @@ const Cart = () => {
         />
         <div className="cart-main-area pt-90 pb-100">
           <div className="container">
-            {cartItems && cartItems.length >= 1 ? (
+            {cartItems.length > 0 ? (
               <Fragment>
                 <h3 className="cart-page-title">Your cart items</h3>
                 <div className="row">
@@ -74,65 +66,43 @@ const Cart = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {cartItems.map((cartItem, key) => {
-                            const finalProductPrice = parseFloat(
-                              (cartItem.price * currency.currencyRate).toFixed(2)
-                            );
+                          {cartItems.map((cartItem) => {
+                            const finalProductPrice = cartItem.price * currency.currencyRate;
                             const finalDiscountedPrice = cartItem.discountprice
-                              ? parseFloat(
-                                  (
-                                    cartItem.discountprice *
-                                    currency.currencyRate
-                                  ).toFixed(2)
-                                )
-                              : null;
+                              ? cartItem.discountprice * currency.currencyRate
+                              : finalProductPrice;
 
-                            const itemQuantity = cartItem.Quantity || 1; // Ensure quantity is valid
+                            const itemQuantity = cartItem.Quantity || 1;
 
                             return (
-                              <tr key={key}>
+                              <tr key={cartItem._id}>
                                 <td className="product-thumbnail">
-                                  <Link
-                                    to={
-                                      process.env.PUBLIC_URL +
-                                      "/product/" +
-                                      cartItem._id
-                                    }
-                                  >
+                                  <Link to={`${process.env.PUBLIC_URL}/product/${cartItem._id}`}>
                                     <img
                                       className="img-fluid"
-                                      src={cartItem.Imageurl}
+                                      src={cartItem.Imageurl || 'path/to/placeholder-image.jpg'}
                                       alt={cartItem.title}
                                     />
                                   </Link>
                                 </td>
                                 <td className="product-name">
-                                  <Link
-                                    to={
-                                      process.env.PUBLIC_URL +
-                                      "/product/" +
-                                      cartItem._id
-                                    }
-                                  >
+                                  <Link to={`${process.env.PUBLIC_URL}/product/${cartItem._id}`}>
                                     {cartItem.title}
                                   </Link>
                                 </td>
                                 <td className="product-price-cart">
-                                  {finalDiscountedPrice !== null ? (
+                                  {cartItem.discountprice ? (
                                     <Fragment>
                                       <span className="amount old">
-                                        {currency.currencySymbol +
-                                          finalProductPrice.toFixed(2)}
+                                        {currency.currencySymbol + finalProductPrice.toFixed(2)}
                                       </span>
                                       <span className="amount">
-                                        {currency.currencySymbol +
-                                          finalDiscountedPrice.toFixed(2)}
+                                        {currency.currencySymbol + finalDiscountedPrice.toFixed(2)}
                                       </span>
                                     </Fragment>
                                   ) : (
                                     <span className="amount">
-                                      {currency.currencySymbol +
-                                        finalProductPrice.toFixed(2)}
+                                      {currency.currencySymbol + finalProductPrice.toFixed(2)}
                                     </span>
                                   )}
                                 </td>
@@ -140,9 +110,7 @@ const Cart = () => {
                                   <div className="cart-plus-minus">
                                     <button
                                       className="dec qtybutton"
-                                      onClick={() =>
-                                        dispatch(decreaseQuantity(cartItem))
-                                      }
+                                      onClick={() => dispatch(decreaseQuantity(cartItem._id))}
                                     >
                                       -
                                     </button>
@@ -154,36 +122,17 @@ const Cart = () => {
                                     />
                                     <button
                                       className="inc qtybutton"
-                                      onClick={() =>
-                                        dispatch(
-                                          addToCart({
-                                            ...cartItem,
-                                            quantity: 1,
-                                          })
-                                        )
-                                      }
+                                      onClick={() => dispatch(incrementQuantity(cartItem._id))}
                                     >
                                       +
                                     </button>
                                   </div>
                                 </td>
                                 <td className="product-subtotal">
-                                  {finalDiscountedPrice !== null
-                                    ? currency.currencySymbol +
-                                      (
-                                        finalDiscountedPrice * itemQuantity
-                                      ).toFixed(2)
-                                    : currency.currencySymbol +
-                                      (
-                                        finalProductPrice * itemQuantity
-                                      ).toFixed(2)}
+                                  {currency.currencySymbol + (finalDiscountedPrice * itemQuantity).toFixed(2)}
                                 </td>
                                 <td className="product-remove">
-                                  <button
-                                    onClick={() =>
-                                      dispatch(deleteFromCart(cartItem._id))
-                                    }
-                                  >
+                                  <button onClick={() => dispatch(deleteFromCart(cartItem._id))}>
                                     <i className="fa fa-times"></i>
                                   </button>
                                 </td>
@@ -195,11 +144,8 @@ const Cart = () => {
                     </div>
                   </div>
                 </div>
-                {/* Display total price */}
                 <div className="cart-total">
-                  <h4>
-                    Total: {currency.currencySymbol + cartTotalPrice.toFixed(2)}
-                  </h4>
+                  <h4>Total: {currency.currencySymbol + cartTotalPrice.toFixed(2)}</h4>
                 </div>
               </Fragment>
             ) : (
@@ -211,9 +157,7 @@ const Cart = () => {
                     </div>
                     <div className="item-empty-area__text">
                       No items found in cart <br />
-                      <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
-                        Shop Now
-                      </Link>
+                      <Link to={`${process.env.PUBLIC_URL}/shop-grid-standard`}>Shop Now</Link>
                     </div>
                   </div>
                 </div>

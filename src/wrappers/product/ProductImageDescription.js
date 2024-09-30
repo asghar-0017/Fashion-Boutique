@@ -15,7 +15,7 @@ const ProductImageDescription = ({ spaceTopClass, spaceBottomClass, product }) =
   const compareItem = compareItems.find(item => item.id === product.id);
 
   // Fetch the discounted price
-  const discountedPrice = getDiscountPrice(product.price, product.discount);
+  const discountedPrice = getDiscountPrice(product.price, product.discountprice);
 
   // Calculate final product prices based on the currency
   const finalProductPrice = +(product.price * currency.currencyRate).toFixed(2);
