@@ -1,238 +1,131 @@
-import { Fragment, useState } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { EffectFade, Thumbs } from "swiper";
-import { Modal } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import Rating from "./sub-components/ProductRating";
-import Swiper, { SwiperSlide } from "../../components/swiper";
-import { getProductCartQuantity } from "../../helpers/product";
+import { Modal, Button, Form } from "react-bootstrap";
+import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
-import { addToCompare } from "../../store/slices/compare-slice";
+import Rating from "./sub-components/ProductRating";
 
-function ProductModal({
+const ProductModal = ({
+  show,
+  onHide,
   product,
   currency,
   discountedPrice,
   finalProductPrice,
   finalDiscountedPrice,
-  show,
-  onHide,
   wishlistItem,
-  compareItem,
-}) {
-  const [thumbsSwiper, setThumbsSwiper] = useState(null);
+}) => {
   const dispatch = useDispatch();
-  const { cartItems } = useSelector((state) => state.cart);
 
-  const [selectedProductColor, setSelectedProductColor] = useState(
-    product.variation ? product.variation[0].color : ""
-  );
-  const [selectedProductSize, setSelectedProductSize] = useState(
-    product.variation ? product.variation[0].size[0].name : ""
-  );
-  const [productStock, setProductStock] = useState(
-    product.variation ? product.variation[0].size[0].stock : product.stock
-  );
-  const [quantityCount, setQuantityCount] = useState(1);
-  const productCartQty = getProductCartQuantity(
-    cartItems,
-    product,
-    selectedProductColor,
-    selectedProductSize
-  );
+  // State to keep track of the quantity
+  const [quantity, setQuantity] = useState(1);
 
-  // Only pass thumbsSwiper when it's not null
-  const gallerySwiperParams = {
-    spaceBetween: 10,
-    loop: true,
-    effect: "fade",
-    fadeEffect: {
-      crossFade: true,
-    },
-    thumbs: thumbsSwiper ? { swiper: thumbsSwiper } : undefined,
-    modules: [EffectFade, Thumbs],
+  // Convert prices to valid numbers and use 0 as fallback values
+  const productPrice = finalProductPrice ? parseFloat(finalProductPrice) : 0;
+  const discountPrice = finalDiscountedPrice ? parseFloat(finalDiscountedPrice) : 0;
+
+  // Calculate the total based on the quantity
+  const totalPrice = discountPrice > 0 ? discountPrice * quantity : productPrice * quantity;
+
+  console.log("Product Price:", productPrice);
+  console.log("Discounted Price:", discountPrice);
+  console.log("Total Price:", totalPrice);
+
+  // Handle add to cart
+  const handleAddToCart = () => {
+    dispatch(
+      addToCart({
+        ...product,
+        price: productPrice,
+        discountprice: discountPrice,
+        quantity: quantity, // Include the quantity in the cart item
+      })
+    );
+    onHide(); // Close the modal after adding to cart
   };
 
-  const thumbnailSwiperParams = {
-    onSwiper: setThumbsSwiper,
-    spaceBetween: 10,
-    slidesPerView: 4,
-    touchRatio: 0.2,
-    freeMode: true,
-    loop: true,
-    slideToClickedSlide: true,
-    navigation: true,
-  };
-
-  const onCloseModal = () => {
-    setThumbsSwiper(null);
-    onHide();
+  // Handle change in quantity
+  const handleQuantityChange = (e) => {
+    const newQty = parseInt(e.target.value);
+    if (!isNaN(newQty) && newQty > 0) {
+      setQuantity(newQty);
+    }
   };
 
   return (
-    <Modal
-      show={show}
-      onHide={onCloseModal}
-      className="product-quickview-modal-wrapper"
-    >
-      <Modal.Header closeButton></Modal.Header>
-
-      <div className="modal-body">
-        <div className="row">
-          <div className="col-md-5 col-sm-12 col-xs-12">
-            <div
-              className="product-small-image-wrapper mt-15"
-              style={{
-                position: "relative",
-                width: "100%",
-                overflow: "hidden",
-              }}
-            >
-              {product.Imageurl && (
-                <Swiper options={thumbnailSwiperParams}>
-                  <img
-                    className="default-img"
-                    src={product.Imageurl}
-                    alt={product.title}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Swiper>
-              )}
-            </div>
+    <Modal show={show} onHide={onHide} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{product.title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className="product-modal">
+          <div className="product-image">
+            <img src={product.Imageurl} alt={product.title} />
           </div>
-
-          <div className="col-md-7 col-sm-12 col-xs-12">
-            <div className="product-details-content quickview-content">
-              <h2>{product.title}</h2>
-              <div className="product-details-price">
-                {discountedPrice !== null ? (
-                  <Fragment>
-                    <span>
-                      {currency.currencySymbol + finalDiscountedPrice}
-                    </span>{" "}
-                    <span className="old">
-                      {currency.currencySymbol + finalProductPrice}
-                    </span>
-                  </Fragment>
-                ) : (
-                  <span>{currency.currencySymbol + finalProductPrice} </span>
-                )}
+          <div className="product-details">
+            <h4 className="product-title">{product.title}</h4>
+            {product.review && product.review > 0 && (
+              <div className="product-rating">
+                <Rating ratingValue={product.review} />
               </div>
-              {product.review && product.review > 0 ? (
-                <div className="pro-details-rating-wrap">
-                  <div className="pro-details-rating">
-                    <Rating ratingValue={product.review} />
-                  </div>
+            )}
+            <div className="product-price">
+              {discountPrice > 0 ? (
+                <div>
+                  <span className="discounted-price">
+                    {currency.currencySymbol + discountPrice.toFixed(2)}
+                  </span>
+                  <span className="old-price">
+                    {currency.currencySymbol + productPrice.toFixed(2)}
+                  </span>
                 </div>
               ) : (
-                ""
+                <span>{currency.currencySymbol + productPrice.toFixed(2)}</span>
               )}
-              <div className="pro-details-list">
-                <p>{product.description}</p>
-              </div>
-              <div className="pro-details-quality">
-                <div className="cart-plus-minus">
-                  <button
-                    onClick={() =>
-                      setQuantityCount(
-                        quantityCount > 1 ? quantityCount - 1 : 1
-                      )
-                    }
-                    className="dec qtybutton"
-                  >
-                    -
-                  </button>
-                  <input
-                    className="cart-plus-minus-box"
-                    type="text"
-                    value={quantityCount}
-                    readOnly
-                  />
-                  <button
-                    onClick={() =>
-                      setQuantityCount(
-                        quantityCount < productStock - productCartQty
-                          ? quantityCount + 1
-                          : quantityCount
-                      )
-                    }
-                    className="inc qtybutton"
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="pro-details-cart btn-hover">
-                  {productStock && productStock > 0 ? (
-                    <button
-                      onClick={() =>
-                        dispatch(addToCart({
-                          ...product,
-                          quantity: quantityCount,
-                          selectedProductColor: selectedProductColor ? selectedProductColor : product.selectedProductColor ? product.selectedProductColor : null,
-                          selectedProductSize: selectedProductSize ? selectedProductSize : product.selectedProductSize ? product.selectedProductSize : null
-                        }))
-                      }
-                      disabled={productCartQty >= productStock}
-                    >
-                      {" "}
-                      Add To Cart{" "}
-                    </button>
-                  ) : (
-                    <button disabled>Out of Stock</button>
-                  )}
-                </div>
-                <div className="pro-details-wishlist">
-                  <button
-                    className={wishlistItem !== undefined ? "active" : ""}
-                    disabled={wishlistItem !== undefined}
-                    title={
-                      wishlistItem !== undefined
-                        ? "Added to wishlist"
-                        : "Add to wishlist"
-                    }
-                    onClick={() => dispatch(addToWishlist(product))}
-                  >
-                    <i className="pe-7s-like" />
-                  </button>
-                </div>
-                <div className="pro-details-compare">
-                  <button
-                    className={compareItem !== undefined ? "active" : ""}
-                    disabled={compareItem !== undefined}
-                    title={
-                      compareItem !== undefined
-                        ? "Added to compare"
-                        : "Add to compare"
-                    }
-                    onClick={() => dispatch(addToCompare(product))}
-                  >
-                    <i className="pe-7s-shuffle" />
-                  </button>
-                </div>
-              </div>
+            </div>
+            <p className="product-description">{product.description}</p>
+
+            {/* Quantity Input */}
+            <Form.Group controlId="quantityInput">
+              <Form.Label>Quantity</Form.Label>
+              <Form.Control
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={handleQuantityChange}
+              />
+            </Form.Group>
+
+            {/* Display Quantity and Total Price */}
+            <div className="product-total">
+              <p>Qty: {quantity}</p>
+              <p>Total: {currency.currencySymbol + totalPrice.toFixed(2)}</p>
             </div>
           </div>
         </div>
-      </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="primary" onClick={handleAddToCart}>
+          Add to Cart
+        </Button>
+        <Button variant="secondary" onClick={() => dispatch(addToWishlist(product))}>
+          Add to Wishlist
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
-}
+};
 
 ProductModal.propTypes = {
-  currency: PropTypes.shape({}),
-  discountedprice: PropTypes.number,
-  finaldiscountedprice: PropTypes.number,
-  finalproductprice: PropTypes.number,
-  onHide: PropTypes.func,
-  product: PropTypes.shape({}),
-  show: PropTypes.bool,
-  wishlistItem: PropTypes.shape({}),
-  compareItem: PropTypes.shape({}),
+  show: PropTypes.bool.isRequired,
+  onHide: PropTypes.func.isRequired,
+  product: PropTypes.object.isRequired,
+  currency: PropTypes.object.isRequired,
+  discountedPrice: PropTypes.number,
+  finalProductPrice: PropTypes.number,
+  finalDiscountedPrice: PropTypes.number,
+  wishlistItem: PropTypes.object,
 };
 
 export default ProductModal;
