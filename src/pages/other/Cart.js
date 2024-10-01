@@ -79,6 +79,9 @@ const Cart = () => {
 
                             const itemQuantity = cartItem.quantity || 1;
 
+                            console.log(cartItem.quantity);
+                            
+
                             return (
                               <tr key={cartItem._id}>
                                 <td className="product-thumbnail">

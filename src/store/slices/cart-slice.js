@@ -318,19 +318,17 @@ import { createSlice } from "@reduxjs/toolkit";
 import cogoToast from "cogo-toast";
 
 const initialState = {
-  cartItems: [], // Stores the cart items with their quantities
+  cartItems: [], 
 };
 
-// Helper function to apply discount
 const applyDiscount = (price, discountPrice) => {
-  return discountPrice || price; // Return discount price if available, else original price
+  return discountPrice || price;
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    // Add item to cart or update quantity if it already exists
     addToCart: (state, action) => {
       const item = action.payload;
       const existingItem = state.cartItems.find(
@@ -338,12 +336,12 @@ const cartSlice = createSlice({
       );
 
       if (existingItem) {
-        existingItem.Quantity += Number(item.Quantity || 1);
+        existingItem.Quantity += Number(item.quantity || 1);
         cogoToast.success(`${item.title} quantity increased in cart`, {
           position: "bottom-left",
         });
       } else {
-        state.cartItems.push({ ...item, Quantity: Number(item.Quantity || 1) });
+        state.cartItems.push({ ...item, quantity: Number(item.quantity || 1) });
         cogoToast.success(`${item.title} added to cart`, {
           position: "bottom-left",
         });
@@ -355,8 +353,9 @@ const cartSlice = createSlice({
       const existingItem = state.cartItems.find(
         (cartItem) => cartItem._id === itemId
       );
+      
       if (existingItem) {
-        existingItem.Quantity += 1;
+        existingItem.quantity += 1;
         cogoToast.info(`Quantity increased for ${existingItem.title}`, {
           position: "bottom-left",
         });
@@ -369,8 +368,8 @@ const cartSlice = createSlice({
         (cartItem) => cartItem._id === itemId
       );
       if (existingItem) {
-        if (existingItem.Quantity > 1) {
-          existingItem.Quantity -= 1;
+        if (existingItem.quantity > 1) {
+          existingItem.quantity -= 1;
           cogoToast.info(`Quantity decreased for ${existingItem.title}`, {
             position: "bottom-left",
           });
