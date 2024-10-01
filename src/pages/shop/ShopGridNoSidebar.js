@@ -67,12 +67,12 @@ const ShopGridNoSidebar = () => {
             <div className="row">
               <div className="col-lg-12">
                 {/* shop topbar default */}
-                <ShopTopbar
+                {/* <ShopTopbar
                   getLayout={getLayout}
                   getFilterSortParams={getFilterSortParams}
                   productCount={products.length}
                   sortedProductCount={currentData.length}
-                /> 
+                />  */}
 
                 {/* shop page content default */}
                 <TabProduct spaceBottomClass="pb-60" category="fashion" />
