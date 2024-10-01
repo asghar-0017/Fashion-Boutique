@@ -26,12 +26,12 @@ const wishlistSlice = createSlice({
         cogoToast.info(`${title} is already in your Wishlist`, { position: "bottom-left" });
       }
     },
-    deleteFromWishlist(state, action) {
+    deleteAllFromWishlist(state, action) {
       const itemId = action.payload;
-      const item = state.wishlistItems.find(item => item._id === itemId);
+      const item = state.wishlistItems.find(item => item.id === itemId);
       
       if (item) {
-        state.wishlistItems = state.wishlistItems.filter(item => item._id !== itemId);
+        state.wishlistItems = state.wishlistItems.filter(item => item.id !== itemId);
         cogoToast.error(`${item.title} removed from Wishlist`, { position: "bottom-left" });
       }
     },
