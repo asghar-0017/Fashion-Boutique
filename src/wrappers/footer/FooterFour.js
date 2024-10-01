@@ -9,7 +9,7 @@ const FooterFour = ({
   spaceTopClass,
   spaceBottomClass,
   spaceLeftClass,
-  spaceRightClass,
+  spaceRightClass,          
   containerClass,
   extraFooterClass,
   sideMenu
