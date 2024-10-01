@@ -11,11 +11,11 @@ import { deleteFromWishlist, deleteAllFromWishlist } from "../../store/slices/wi
 const Wishlist = () => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
-  
+
   const currency = useSelector((state) => state.currency);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
-  
+
   return (
     <Fragment>
       <SEO
@@ -23,12 +23,11 @@ const Wishlist = () => {
         description="Wishlist page of flone react minimalist eCommerce template."
       />
       <LayoutOne headerTop="visible">
-        {/* Breadcrumb */}
-        <Breadcrumb 
+        <Breadcrumb
           pages={[
             { label: "Home", path: process.env.PUBLIC_URL + "/" },
-            { label: "Wishlist", path: process.env.PUBLIC_URL + pathname }
-          ]} 
+            { label: "Wishlist", path: process.env.PUBLIC_URL + pathname },
+          ]}
         />
         <div className="cart-main-area pt-90 pb-100">
           <div className="container">
@@ -52,7 +51,7 @@ const Wishlist = () => {
                           {wishlistItems.map((wishlistItem) => {
                             const discountedPrice = getDiscountPrice(
                               wishlistItem.price,
-                              wishlistItem.discount
+                              wishlistItem.discountprice
                             );
                             const finalProductPrice = (
                               wishlistItem.price * currency.currencyRate
@@ -61,7 +60,7 @@ const Wishlist = () => {
                               discountedPrice * currency.currencyRate
                             ).toFixed(2);
                             const cartItem = cartItems.find(
-                              item => item.id === wishlistItem.id
+                              (item) => item.id === wishlistItem.id
                             );
 
                             return (
@@ -70,7 +69,7 @@ const Wishlist = () => {
                                   <Link
                                     to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
                                   >
-                                    {wishlistItem.image && wishlistItem.image.length > 0 ? (
+                                    {wishlistItem.Imageurl ? (
                                       <img
                                         className="img-fluid"
                                         src={`${process.env.PUBLIC_URL}${wishlistItem.Imageurl}`}
@@ -84,9 +83,9 @@ const Wishlist = () => {
 
                                 <td className="product-name text-center">
                                   <Link
-                                    to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
+                                    to={`${process.env.PUBLIC_URL}/product/${wishlistItem.title}`}
                                   >
-                                    {wishlistItem.name}
+                                    {wishlistItem.title}
                                   </Link>
                                 </td>
 
@@ -116,24 +115,30 @@ const Wishlist = () => {
                                     >
                                       Buy now
                                     </a>
-                                  ) : wishlistItem.variation && wishlistItem.variation.length > 0 ? (
+                                  ) : wishlistItem.variation?.length > 0 ? (
                                     <Link
                                       to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
                                     >
                                       Select option
                                     </Link>
-                                  ) : wishlistItem.stock && wishlistItem.stock > 0 ? (
+                                  ) : (
                                     <button
                                       onClick={() => dispatch(addToCart(wishlistItem))}
                                       className={cartItem?.quantity > 0 ? "active" : ""}
-                                      disabled={cartItem?.quantity > 0}
-                                      title={wishlistItem ? "Add to cart" : "Added to cart"}
+                                      disabled={cartItem?.quantity > 0 || wishlistItem.stock <= 0}
+                                      title={
+                                        cartItem?.quantity > 0
+                                          ? "Added to cart"
+                                          : wishlistItem.stock <= 0
+                                          ? "Out of stock"
+                                          : "Add to cart"
+                                      }
                                     >
-                                      {cartItem?.quantity > 0 ? "Added" : "Add to cart"}
-                                    </button>
-                                  ) : (
-                                    <button className="active">
-                                      Out of stock
+                                      {wishlistItem.stock <= 0
+                                        ? "Out of Stock"
+                                        : cartItem?.quantity > 0
+                                        ? "Added"
+                                        : "Add to Cart"}
                                     </button>
                                   )}
                                 </td>
@@ -155,21 +160,29 @@ const Wishlist = () => {
                 </div>
 
                 <div className="row">
-                  <div className="col-lg-12">
-                    <div className="cart-shipping-update-wrapper">
-                      <div className="cart-shipping-update">
-                        <Link to={`${process.env.PUBLIC_URL}/shop-grid-standard`}>
-                          Continue Shopping
-                        </Link>
-                      </div>
-                      <div className="cart-clear">
-                        <button onClick={() => dispatch(deleteAllFromWishlist())}>
-                          Clear Wishlist
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+  <div className="col-lg-12">
+    <div className="cart-shipping-update-wrapper" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      
+      {/* Continue Shopping on the left */}
+      <div className="cart-shipping-update">
+        <Link to={`${process.env.PUBLIC_URL}/`} className="continue-shopping-btn">
+          Continue Shopping
+        </Link>
+      </div>
+
+      {/* Clear Wishlist on the right */}
+      <div className="cart-clear">
+        <button 
+          onClick={() => dispatch(deleteAllFromWishlist())} 
+          className="clear-wishlist-btn"
+        >
+          Clear Wishlist
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
               </Fragment>
             ) : (
               <div className="row">
