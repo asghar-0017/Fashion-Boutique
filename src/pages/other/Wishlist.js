@@ -62,7 +62,8 @@ const Wishlist = () => {
                             const cartItem = cartItems.find(
                               (item) => item.id === wishlistItem.id
                             );
-
+                            console.log("WishList Items",wishlistItem)
+                            
                             return (
                               <tr key={wishlistItem.id}>
                                 <td className="product-thumbnail">
@@ -83,7 +84,7 @@ const Wishlist = () => {
 
                                 <td className="product-name text-center">
                                   <Link
-                                    to={`${process.env.PUBLIC_URL}/product/${wishlistItem.title}`}
+                                    to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
                                   >
                                     {wishlistItem.title}
                                   </Link>
@@ -116,16 +117,27 @@ const Wishlist = () => {
                                       Buy now
                                     </a>
                                   ) : wishlistItem.variation?.length > 0 ? (
-                                    <Link
-                                      to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
-                                    >
+                                    <Link to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}>
                                       Select option
                                     </Link>
                                   ) : (
                                     <button
-                                      onClick={() => dispatch(addToCart(wishlistItem))}
+                                    
+                                    onClick={() =>
+                                      dispatch(
+                                        addToCart({
+                                          ...wishlistItem,
+                                          price: wishlistItem.discountprice !== null 
+                                            ? finalDiscountedPrice 
+                                            : finalProductPrice,
+                                          discountedPrice: wishlistItem.discountprice !== null 
+                                            ? finalDiscountedPrice 
+                                            : null,
+                                        })
+                                      )
+                                    }
+                                    
                                       className={cartItem?.quantity > 0 ? "active" : ""}
-                                      disabled={cartItem?.quantity > 0 || wishlistItem.stock <= 0}
                                       title={
                                         cartItem?.quantity > 0
                                           ? "Added to cart"
@@ -133,6 +145,7 @@ const Wishlist = () => {
                                           ? "Out of stock"
                                           : "Add to cart"
                                       }
+                                      disabled={wishlistItem.stock <= 0}
                                     >
                                       {wishlistItem.stock <= 0
                                         ? "Out of Stock"
@@ -140,7 +153,9 @@ const Wishlist = () => {
                                         ? "Added"
                                         : "Add to Cart"}
                                     </button>
+                                    
                                   )}
+                                  
                                 </td>
 
                                 <td className="product-remove">
@@ -160,29 +175,35 @@ const Wishlist = () => {
                 </div>
 
                 <div className="row">
-  <div className="col-lg-12">
-    <div className="cart-shipping-update-wrapper" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-      
-      {/* Continue Shopping on the left */}
-      <div className="cart-shipping-update">
-        <Link to={`${process.env.PUBLIC_URL}/`} className="continue-shopping-btn">
-          Continue Shopping
-        </Link>
-      </div>
+                  <div className="col-lg-12">
+                    <div
+                      className="cart-shipping-update-wrapper"
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div className="cart-shipping-update">
+                        <Link
+                          to={`${process.env.PUBLIC_URL}/`}
+                          className="continue-shopping-btn"
+                        >
+                          Continue Shopping
+                        </Link>
+                      </div>
 
-      {/* Clear Wishlist on the right */}
-      <div className="cart-clear">
-        <button 
-          onClick={() => dispatch(deleteAllFromWishlist())} 
-          className="clear-wishlist-btn"
-        >
-          Clear Wishlist
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
+                      <div className="cart-clear">
+                        <button
+                          onClick={() => dispatch(deleteAllFromWishlist())}
+                          className="clear-wishlist-btn"
+                        >
+                          Clear Wishlist
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </Fragment>
             ) : (
               <div className="row">

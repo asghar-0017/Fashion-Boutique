@@ -71,10 +71,10 @@ const ProductDescriptionInfo = ({
   };
 
   // Handler for adding item to compare
-  const handleAddToCompare = () => {
-    dispatch(addToCompare(product));
-    cogoToast.success("Added to Compare!");
-  };
+  // const handleAddToCompare = () => {
+  //   dispatch(addToCompare(product));
+  //   cogoToast.success("Added to Compare!");
+  // };
 
   console.log(quantityCount);
   
@@ -205,20 +205,7 @@ const ProductDescriptionInfo = ({
               <i className="pe-7s-like" />
             </button>
           </div>
-          <div className="pro-details-compare">
-            <button
-              className={compareItem !== undefined ? "active" : ""}
-              disabled={compareItem !== undefined}
-              title={
-                compareItem !== undefined
-                  ? "Added to compare"
-                  : "Add to compare"
-              }
-              onClick={handleAddToCompare}
-            >
-              <i className="pe-7s-shuffle" />
-            </button>
-          </div>
+          
       </div>
     </div>
   );

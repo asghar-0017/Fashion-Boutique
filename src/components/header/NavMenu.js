@@ -54,11 +54,11 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
                   {t("wishlist")}
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to={process.env.PUBLIC_URL + "/compare"}>
                   {t("compare")}
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to={process.env.PUBLIC_URL + "/my-account"}>
                   {t("my_account")}
