@@ -18,36 +18,36 @@ const ProductModal = ({
 }) => {
   const dispatch = useDispatch();
 
-  // State to keep track of the quantity
   const [quantity, setQuantity] = useState(1);
 
-  // Convert prices to valid numbers and use 0 as fallback values
   const productPrice = finalProductPrice ? parseFloat(finalProductPrice) : 0;
   const discountPrice = finalDiscountedPrice ? parseFloat(finalDiscountedPrice) : 0;
 
-  // Calculate the total based on the quantity
   const totalPrice = discountPrice > 0 ? discountPrice * quantity : productPrice * quantity;
 
-  console.log("Product Price:", productPrice);
-  console.log("Discounted Price:", discountPrice);
-  console.log("Total Price:", totalPrice);
+  // console.log("Product Price:", productPrice);
+  // console.log("Discounted Price:", discountPrice);
+  // console.log("Total Price:", totalPrice);
 
-  // Handle add to cart
   const handleAddToCart = () => {
     dispatch(
       addToCart({
         ...product,
         price: productPrice,
         discountprice: discountPrice,
-        quantity: quantity, // Include the quantity in the cart item
+        quantity: quantity, 
       })
     );
-    onHide(); // Close the modal after adding to cart
+    onHide(); 
   };
+
+  console.log(quantity);
+  
 
   // Handle change in quantity
   const handleQuantityChange = (e) => {
     const newQty = parseInt(e.target.value);
+    
     if (!isNaN(newQty) && newQty > 0) {
       setQuantity(newQty);
     }
@@ -129,3 +129,4 @@ ProductModal.propTypes = {
 };
 
 export default ProductModal;
+

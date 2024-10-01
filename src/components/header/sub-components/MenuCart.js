@@ -12,11 +12,11 @@ const MenuCart = () => {
   useEffect(() => {
     const calculateTotalPrice = () => {
       let totalPrice = 0;
+      
       cartItems.forEach((item) => {
-        // Determine the applicable price based on whether the item is on sale
         const price = item.discountprice ? item.discountprice : item.price; 
         const finalProductPrice = price * currency.currencyRate; // Calculate price in current currency
-        const quantity = item.Quantity || 1; // Ensure Quantity is defined
+        const quantity = item.quantity || 1; // Ensure Quantity is defined
         totalPrice += finalProductPrice * quantity; // Calculate the total price
       });
       setCartTotalPrice(totalPrice);
@@ -34,7 +34,7 @@ const MenuCart = () => {
               const discountedPrice = item.discountprice || item.price;
               const finalProductPrice = discountedPrice * currency.currencyRate;
 
-              const quantity = item.Quantity || 1;
+              const quantity = item.quantity || 1;
 
               return (
                 <li className="single-shopping-cart" key={index}>
@@ -53,11 +53,11 @@ const MenuCart = () => {
                     <span>
                       {item.discountprice ? (
                         <>
-                          <span style={{ textDecoration: 'line-through' }}>
-                            {currency.currencySymbol + (item.price * currency.currencyRate).toFixed(2)}
-                          </span>{" "}
                           <span>
                             {currency.currencySymbol + finalProductPrice.toFixed(2)}
+                          </span>{" "}
+                          <span style={{ textDecoration: 'line-through' }}>
+                            {currency.currencySymbol + (item.price * currency.currencyRate).toFixed(2)}
                           </span>
                         </>
                       ) : (

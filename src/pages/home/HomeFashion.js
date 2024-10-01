@@ -29,7 +29,7 @@ const HomeFashion = () => {
         {/* <ProductGridSingle /> */}
 
         {/* blog featured */}
-        <BlogFeatured spaceBottomClass="pb-55" />
+        {/* <BlogFeatured spaceBottomClass="pb-55" /> */}
       </LayoutOne>
     </>
   );

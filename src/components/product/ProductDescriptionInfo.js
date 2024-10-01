@@ -20,6 +20,9 @@ const ProductDescriptionInfo = ({
 }) => {
   const dispatch = useDispatch();
 
+  console.log(product);
+  
+
   // Initialize state with product variations
   const initialColor = product?.variations?.[0]?.color || "";
   const initialSize = product?.variations?.[0]?.sizes?.[0]?.name || "";
@@ -39,11 +42,14 @@ const ProductDescriptionInfo = ({
     selectedProductSize
   );
 
+  
+  
   const totalPrice =
-    !isNaN(discountedPrice) && discountedPrice !== null
-      ? parseFloat(finalDiscountedPrice)
-      : parseFloat(finalProductPrice);
-
+  !isNaN(discountedPrice) && discountedPrice !== null
+  ? parseFloat(finalDiscountedPrice)
+  : parseFloat(finalProductPrice);
+  
+  // console.log(finalProductPrice);
   const calculatedTotalPrice = totalPrice * quantityCount;
 
   // Handler for adding item to cart
@@ -51,9 +57,9 @@ const ProductDescriptionInfo = ({
     dispatch(
       addToCart({
         ...product,
-        Quantity: quantityCount,
-        selectedProductColor,
-        selectedProductSize,
+        discountprice: calculatedTotalPrice,
+        price: (finalProductPrice * quantityCount).toFixed(2),
+        quantity: quantityCount, 
       })
     );
   };
@@ -70,16 +76,19 @@ const ProductDescriptionInfo = ({
     cogoToast.success("Added to Compare!");
   };
 
+  console.log(quantityCount);
+  
+
   return (
     <div className="product-details-content ml-70">
-      <h2>{product.name}</h2>
+      <h2>{product.title}</h2>
       <div className="product-details-price">
         <span>
           {currency.currencySymbol + calculatedTotalPrice.toFixed(2)}
         </span>
         {discountedPrice !== null && (
           <span className="old">
-            {currency.currencySymbol + (totalPrice * quantityCount).toFixed(2)}
+            {currency.currencySymbol + (finalProductPrice * quantityCount).toFixed(2)}
           </span>
         )}
       </div>

@@ -17,6 +17,9 @@ const ProductImageDescription = ({ spaceTopClass, spaceBottomClass, product }) =
   // Fetch the discounted price
   const discountedPrice = getDiscountPrice(product.price, product.discountprice);
 
+  console.log(discountedPrice);
+  
+
   // Calculate final product prices based on the currency
   const finalProductPrice = +(product.price * currency.currencyRate).toFixed(2);
   const finalDiscountedPrice = discountedPrice 

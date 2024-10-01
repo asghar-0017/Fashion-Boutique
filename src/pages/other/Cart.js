@@ -17,6 +17,9 @@ const Cart = () => {
   const currency = useSelector((state) => state.currency);
   const cartItems = useSelector((state) => state.cart.cartItems);
 
+  console.log(cartItems);
+  
+
   const [cartTotalPrice, setCartTotalPrice] = useState(0);
 
   useEffect(() => {
@@ -26,7 +29,9 @@ const Cart = () => {
         ? cartItem.discountprice * currency.currencyRate
         : finalProductPrice;
 
-      const itemQuantity = cartItem.Quantity || 1;
+      const itemQuantity = cartItem.quantity || 1;
+      console.log(cartItem.quantity);
+      
       return acc + finalDiscountedPrice * itemQuantity;
     }, 0);
 
@@ -72,7 +77,7 @@ const Cart = () => {
                               ? cartItem.discountprice * currency.currencyRate
                               : finalProductPrice;
 
-                            const itemQuantity = cartItem.Quantity || 1;
+                            const itemQuantity = cartItem.quantity || 1;
 
                             return (
                               <tr key={cartItem._id}>

@@ -148,9 +148,9 @@ import { addToWishlist } from "../../store/slices/wishlist-slice";
 
 const calculatePrices = (product, currencyRate) => {
   const basePrice = product.price * currencyRate;
-  const discountPercentage = product.discountprice || 0; // Assuming discountprice is the discount percentage
+  const discountPercentage = product.discountprice || 0; 
   const finalDiscountedPrice = discountPercentage
-    ? basePrice * (1 - discountPercentage / 100) // Calculate the discounted price
+    ? basePrice * (1 - discountPercentage / 100) 
     : basePrice;
   return {
     basePrice: basePrice.toFixed(2),
@@ -200,7 +200,7 @@ const ProductGridSingle = ({
           {product.discountprice && (
             <div className="product-img-badges">
               <span className="pink">-{product.discountprice}%</span>
-              <span className="purple">Sale</span> {/* Show "Sale" if discountprice exists */}
+              <span className="purple">Sale</span> 
             </div>
           )}
           <div className="product-action">

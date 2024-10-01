@@ -25,6 +25,8 @@ const Product = () => {
         const response = await axios.get(`${apiKey}/get-product/${id}`);
         
         if (response.status === 200 && response.data.data) {
+          console.log(response.data.data);
+          
           setProduct(response.data.data); 
         } else {
           setError("Product data not found or invalid response");
