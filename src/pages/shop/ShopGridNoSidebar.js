@@ -8,6 +8,7 @@ import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import ShopTopbar from "../../wrappers/product/ShopTopbar";
 import ShopProducts from "../../wrappers/product/ShopProducts";
+import TabProduct from "../../wrappers/product/TabProduct";
 
 const ShopGridNoSidebar = () => {
   const [layout, setLayout] = useState("grid three-column");
@@ -71,10 +72,10 @@ const ShopGridNoSidebar = () => {
                   getFilterSortParams={getFilterSortParams}
                   productCount={products.length}
                   sortedProductCount={currentData.length}
-                />
+                /> 
 
                 {/* shop page content default */}
-                <ShopProducts layout={layout} products={currentData} />
+                <TabProduct spaceBottomClass="pb-60" category="fashion" />
 
                 {/* shop product pagination */}
                 <div className="pro-pagination-style text-center mt-30">
