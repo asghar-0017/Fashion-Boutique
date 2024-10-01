@@ -186,6 +186,17 @@ const ProductGridSingle = ({
     );
   };
 
+
+  const handleWhishList = (product) => {
+    dispatch(
+      addToWishlist({
+        ...product,
+        price: +basePrice, 
+        discountprice: +finalDiscountedPrice, 
+      })
+    );
+  };
+
   return (
     <Fragment>
       <div className={clsx("product-wrap", spaceBottomClass)}>
@@ -205,7 +216,7 @@ const ProductGridSingle = ({
           )}
           <div className="product-action">
             <div className="pro-same-action pro-wishlist">
-              <button onClick={() => dispatch(addToWishlist(product))}>
+              <button onClick={() => handleWhishList(product)}>
                 <i className="pe-7s-like" />
               </button>
             </div>

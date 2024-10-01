@@ -41,7 +41,7 @@ const ProductModal = ({
     onHide(); 
   };
 
-  console.log(quantity);
+  // console.log(quantity);
   
 
   // Handle change in quantity
@@ -129,4 +129,3 @@ ProductModal.propTypes = {
 };
 
 export default ProductModal;
-

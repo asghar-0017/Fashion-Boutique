@@ -12,7 +12,7 @@ const ProductGrid = ({
 }) => {
   const { products } = useSelector((state) => state.product);
   
-  console.log("Products from Redux:", products);
+  // console.log("Products from Redux:", products);
   
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);

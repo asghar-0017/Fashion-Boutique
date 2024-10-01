@@ -10,11 +10,14 @@ import { deleteFromWishlist, deleteAllFromWishlist } from "../../store/slices/wi
 
 const Wishlist = () => {
   const dispatch = useDispatch();
-  const { pathname } = useLocation();
+  const { pathname } = useLocation(); 
 
   const currency = useSelector((state) => state.currency);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
+
+  console.log(wishlistItems);
+  
 
   return (
     <Fragment>
@@ -49,19 +52,28 @@ const Wishlist = () => {
                         </thead>
                         <tbody>
                           {wishlistItems.map((wishlistItem) => {
-                            const discountedPrice = getDiscountPrice(
-                              wishlistItem.price,
-                              wishlistItem.discountprice
-                            );
-                            const finalProductPrice = (
-                              wishlistItem.price * currency.currencyRate
-                            ).toFixed(2);
-                            const finalDiscountedPrice = (
-                              discountedPrice * currency.currencyRate
-                            ).toFixed(2);
+                            // const discountedPrice = getDiscountPrice(
+                            //   wishlistItem.price,
+                            //   wishlistItem.discountprice
+                            // );
+                            // const finalProductPrice = (
+                            //   wishlistItem.price * currency.currencyRate
+                            // ).toFixed(2);
+                            // const finalDiscountedPrice = (
+                            //   discountedPrice * currency.currencyRate
+                            // ).toFixed(2);
                             const cartItem = cartItems.find(
                               (item) => item.id === wishlistItem.id
                             );
+
+
+                            const finalProductPrice = wishlistItem.price * currency.currencyRate;
+                            const finalDiscountedPrice = wishlistItem.discountprice
+                              ? wishlistItem.discountprice * currency.currencyRate
+                              : finalProductPrice;
+
+                            
+
                             console.log("WishList Items",wishlistItem)
                             
                             return (
@@ -91,7 +103,7 @@ const Wishlist = () => {
                                 </td>
 
                                 <td className="product-price-cart">
-                                  {discountedPrice !== null ? (
+                                  {finalDiscountedPrice !== null ? (
                                     <Fragment>
                                       <span className="amount old">
                                         {currency.currencySymbol + finalProductPrice}
@@ -127,16 +139,11 @@ const Wishlist = () => {
                                       dispatch(
                                         addToCart({
                                           ...wishlistItem,
-                                          price: wishlistItem.discountprice !== null 
-                                            ? finalDiscountedPrice 
-                                            : finalProductPrice,
-                                          discountedPrice: wishlistItem.discountprice !== null 
-                                            ? finalDiscountedPrice 
-                                            : null,
+                                          price:finalProductPrice,
+                                          discountedPrice: finalDiscountedPrice 
                                         })
                                       )
-                                    }
-                                    
+                                    }                                    
                                       className={cartItem?.quantity > 0 ? "active" : ""}
                                       title={
                                         cartItem?.quantity > 0
@@ -147,6 +154,8 @@ const Wishlist = () => {
                                       }
                                       disabled={wishlistItem.stock <= 0}
                                     >
+                                        {console.log(finalDiscountedPrice, finalProductPrice)
+                                    }
                                       {wishlistItem.stock <= 0
                                         ? "Out of Stock"
                                         : cartItem?.quantity > 0
