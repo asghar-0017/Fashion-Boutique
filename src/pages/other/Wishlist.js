@@ -223,7 +223,7 @@ const Wishlist = () => {
                     </div>
                     <div className="item-empty-area__text">
                       No items found in wishlist <br />
-                      <Link to={`${process.env.PUBLIC_URL}/shop-grid-standard`}>
+                      <Link to={`${process.env.PUBLIC_URL}/`}>
                         Add Items
                       </Link>
                     </div>
