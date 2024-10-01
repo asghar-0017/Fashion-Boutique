@@ -1,5 +1,5 @@
 const API_CONFIG = {
-    apiKey: `https://e-commerce-lime-omega.vercel.app`,
+    apiKey: `https://fashion-boutique-backend.vercel.app`,
 };
   
 export default API_CONFIG;

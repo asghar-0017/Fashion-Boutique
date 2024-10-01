@@ -393,6 +393,13 @@ const cartSlice = createSlice({
         position: "bottom-left",
       });
     },
+
+    clearCart: (state) => {
+      state.cartItems = [];
+      // cogoToast.success(`Cart cleared successfully`, {
+      //   position: "bottom-left",
+      // });
+    },
   },
 });
 
@@ -401,6 +408,7 @@ export const {
   incrementQuantity,
   decreaseQuantity,
   deleteFromCart,
+  clearCart
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
