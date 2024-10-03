@@ -11,8 +11,8 @@ const HomeFashion = () => {
   return (
     <>
       <SEO
-        titleTemplate="Fashion Home"
-        description="Fashion home of flone react minimalist eCommerce template."
+        titleTemplate="Needs and Luxuries"
+        description="Needs and Luxuries a eCommerce website."
       />
       <LayoutOne
         headerContainerClass="container-fluid"

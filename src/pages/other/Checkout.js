@@ -13,12 +13,12 @@ import Swal from "sweetalert2";
 
 const Checkout = () => {
   let cartTotalPrice = 0;
+  let { pathname } = useLocation();
+  let navigate = useNavigate()
   const { apiKey } = API_CONFIG;
   const dispatch = useDispatch(); 
-  let { pathname } = useLocation();
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
-  let navigate = useNavigate()
 
   const {
     register,
@@ -28,10 +28,12 @@ const Checkout = () => {
 
   const onSubmit = async (data) => {
     const products = cartItems.map((item) => ({
-      productId: item._id, 
+      // productId: item._id, 
       quantity: item.quantity,
       price: item.price,
-    }));
+      name: item.title,
+      Imageurl: item.Imageurl,
+    }));    
 
     const billingDetails = {
       firstName: data.firstName,
@@ -43,7 +45,7 @@ const Checkout = () => {
       email: data.email,
       additionalInformation: data.additionalInfo,
       products: products,
-    };
+    };    
 
     try {
       const response = await axios.post(`${apiKey}/create-billing-detail`, billingDetails, {
@@ -79,7 +81,7 @@ const Checkout = () => {
     <Fragment>
       <SEO
         titleTemplate="Checkout"
-        description="Checkout page of flone react minimalist eCommerce template."
+        description="Checkout page of Needs and Luxuries eCommerce template."
       />
       <LayoutOne headerTop="visible">
         <Breadcrumb 

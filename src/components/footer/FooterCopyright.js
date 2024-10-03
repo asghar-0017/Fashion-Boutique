@@ -1,13 +1,14 @@
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; 
 
 const FooterCopyright = ({ footerLogo, spaceBottomClass, colorClass }) => {
   return (
     <div className={clsx("copyright", spaceBottomClass, colorClass)}>
       <div className="footer-logo">
         <Link to={process.env.PUBLIC_URL + "/"}>
-          <img alt="" src={process.env.PUBLIC_URL + footerLogo} />
+          {/* <img alt="" src={process.env.PUBLIC_URL + footerLogo} /> */}
+          <h4 style={{fontWeight: "bold", color: "#313131"}}>Needs and Luxuries</h4>
         </Link>
       </div>
       <p>
@@ -17,7 +18,7 @@ const FooterCopyright = ({ footerLogo, spaceBottomClass, colorClass }) => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          Flone
+          Needs and Luxuries
         </a>
         .<br /> All Rights Reserved
       </p>

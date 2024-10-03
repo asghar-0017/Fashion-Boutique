@@ -17,9 +17,6 @@ const Cart = () => {
   const currency = useSelector((state) => state.currency);
   const cartItems = useSelector((state) => state.cart.cartItems);
 
-  console.log(cartItems);
-  
-
   const [cartTotalPrice, setCartTotalPrice] = useState(0);
 
   useEffect(() => {
@@ -31,7 +28,7 @@ const Cart = () => {
 
       const itemQuantity = cartItem.quantity || 1;
       console.log(cartItem.quantity);
-      
+
       return acc + finalDiscountedPrice * itemQuantity;
     }, 0);
 
@@ -42,7 +39,7 @@ const Cart = () => {
     <Fragment>
       <SEO
         titleTemplate="Cart"
-        description="Cart page of flone react minimalist eCommerce template."
+        description="About page of Needs and Luxuries eCommerce template."
       />
       <LayoutOne headerTop="visible">
         <Breadcrumb
@@ -72,7 +69,8 @@ const Cart = () => {
                         </thead>
                         <tbody>
                           {cartItems.map((cartItem) => {
-                            const finalProductPrice = cartItem.price * currency.currencyRate;
+                            const finalProductPrice =
+                              cartItem.price * currency.currencyRate;
                             const finalDiscountedPrice = cartItem.discountprice
                               ? cartItem.discountprice * currency.currencyRate
                               : finalProductPrice;
@@ -80,21 +78,27 @@ const Cart = () => {
                             const itemQuantity = cartItem.quantity || 1;
 
                             console.log(cartItem.quantity);
-                            
 
                             return (
                               <tr key={cartItem._id}>
                                 <td className="product-thumbnail">
-                                  <Link to={`${process.env.PUBLIC_URL}/product/${cartItem._id}`}>
+                                  <Link
+                                    to={`${process.env.PUBLIC_URL}/product/${cartItem._id}`}
+                                  >
                                     <img
                                       className="img-fluid"
-                                      src={cartItem.Imageurl || 'path/to/placeholder-image.jpg'}
+                                      src={
+                                        cartItem.Imageurl ||
+                                        "path/to/placeholder-image.jpg"
+                                      }
                                       alt={cartItem.title}
                                     />
                                   </Link>
                                 </td>
                                 <td className="product-name">
-                                  <Link to={`${process.env.PUBLIC_URL}/product/${cartItem._id}`}>
+                                  <Link
+                                    to={`${process.env.PUBLIC_URL}/product/${cartItem._id}`}
+                                  >
                                     {cartItem.title}
                                   </Link>
                                 </td>
@@ -102,15 +106,18 @@ const Cart = () => {
                                   {cartItem.discountprice ? (
                                     <Fragment>
                                       <span className="amount old">
-                                        {currency.currencySymbol + finalProductPrice.toFixed(2)}
+                                        {currency.currencySymbol +
+                                          finalProductPrice.toFixed(2)}
                                       </span>
                                       <span className="amount">
-                                        {currency.currencySymbol + finalDiscountedPrice.toFixed(2)}
+                                        {currency.currencySymbol +
+                                          finalDiscountedPrice.toFixed(2)}
                                       </span>
                                     </Fragment>
                                   ) : (
                                     <span className="amount">
-                                      {currency.currencySymbol + finalProductPrice.toFixed(2)}
+                                      {currency.currencySymbol +
+                                        finalProductPrice.toFixed(2)}
                                     </span>
                                   )}
                                 </td>
@@ -118,7 +125,9 @@ const Cart = () => {
                                   <div className="cart-plus-minus">
                                     <button
                                       className="dec qtybutton"
-                                      onClick={() => dispatch(decreaseQuantity(cartItem._id))}
+                                      onClick={() =>
+                                        dispatch(decreaseQuantity(cartItem._id))
+                                      }
                                     >
                                       -
                                     </button>
@@ -130,17 +139,28 @@ const Cart = () => {
                                     />
                                     <button
                                       className="inc qtybutton"
-                                      onClick={() => dispatch(incrementQuantity(cartItem._id))}
+                                      onClick={() =>
+                                        dispatch(
+                                          incrementQuantity(cartItem._id)
+                                        )
+                                      }
                                     >
                                       +
                                     </button>
                                   </div>
                                 </td>
                                 <td className="product-subtotal">
-                                  {currency.currencySymbol + (finalDiscountedPrice * itemQuantity).toFixed(2)}
+                                  {currency.currencySymbol +
+                                    (
+                                      finalDiscountedPrice * itemQuantity
+                                    ).toFixed(2)}
                                 </td>
                                 <td className="product-remove">
-                                  <button onClick={() => dispatch(deleteFromCart(cartItem._id))}>
+                                  <button
+                                    onClick={() =>
+                                      dispatch(deleteFromCart(cartItem._id))
+                                    }
+                                  >
                                     <i className="fa fa-times"></i>
                                   </button>
                                 </td>
@@ -153,7 +173,14 @@ const Cart = () => {
                   </div>
                 </div>
                 <div className="cart-total">
-                  <h4>Total: {currency.currencySymbol + cartTotalPrice.toFixed(2)}</h4>
+                  <h4 style={{fontWeight: "bold", marginTop: "20px"}}>
+                    Total: {currency.currencySymbol + cartTotalPrice.toFixed(2)}
+                  </h4>
+                  <div className="item-empty-area__text">
+                    <Link to={`${process.env.PUBLIC_URL}/checkout`}>
+                      Buy Now
+                    </Link>
+                  </div>
                 </div>
               </Fragment>
             ) : (
@@ -165,7 +192,7 @@ const Cart = () => {
                     </div>
                     <div className="item-empty-area__text">
                       No items found in cart <br />
-                      <Link to={`${process.env.PUBLIC_URL}/shop-grid-standard`}>Shop Now</Link>
+                      <Link to={`${process.env.PUBLIC_URL}/`}>Shop Now</Link>
                     </div>
                   </div>
                 </div>

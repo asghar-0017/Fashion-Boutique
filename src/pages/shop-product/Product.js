@@ -57,7 +57,7 @@ const Product = () => {
     <Fragment>
       <SEO
         titleTemplate="Product Page"
-        description="Product Page of flone react minimalist eCommerce template."
+        description="Product page of Needs and Luxuries eCommerce template."
       />
 
       <LayoutOne headerTop="visible">

@@ -7,6 +7,7 @@ import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
 import cogoToast from "cogo-toast";
+import { useNavigate } from "react-router-dom";
 
 const ProductDescriptionInfo = ({
   product,
@@ -19,8 +20,9 @@ const ProductDescriptionInfo = ({
   compareItem,
 }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate()
 
-  console.log(product);
+  // console.log(product);
   
 
   // Initialize state with product variations
@@ -62,6 +64,11 @@ const ProductDescriptionInfo = ({
         quantity: quantityCount, 
       })
     );
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart()
+    navigate("/checkout")
   };
 
   // Handler for adding item to wishlist
@@ -188,6 +195,9 @@ const ProductDescriptionInfo = ({
 
         <div className="pro-details-cart btn-hover">
           <button onClick={handleAddToCart}>Add to Cart</button>
+        </div>
+        <div className="pro-details-cart btn-hover">
+          <button onClick={handleBuyNow}>Buy Now</button>
         </div>
 
         {/* Wishlist and Compare Icons */}

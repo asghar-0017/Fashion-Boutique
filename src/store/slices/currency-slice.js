@@ -3,16 +3,15 @@ const { createSlice } = require('@reduxjs/toolkit');
 const currencySlice = createSlice({
     name: "currency",
     initialState: {
-        currencySymbol: "₨", // PKR symbol
+        currencySymbol: "₨",
         currencyName: "PKR",
-        currencyRate: 1 // Assuming PKR is the base currency
+        currencyRate: 1 
     },
     
     reducers: {
         setCurrency(state, action) {
             const currencyName = action.payload;
             
-            // Handling different currency types
             switch (currencyName) {
                 case "PKR":
                     return {

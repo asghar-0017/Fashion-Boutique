@@ -17,7 +17,7 @@ const About = () => {
     <Fragment>
       <SEO
         titleTemplate="About us"
-        description="About page of flone react minimalist eCommerce template."
+        description="About page of Needs and Luxuries eCommerce template."
       /> 
       <LayoutOne headerTop="visible">
         {/* breadcrumb */}

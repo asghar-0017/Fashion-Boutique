@@ -50,7 +50,7 @@ const ShopGridNoSidebar = () => {
     <Fragment>
       <SEO
         titleTemplate="Shop Page"
-        description="Shop page of flone react minimalist eCommerce template."
+        description="Shop page of Needs and Luxuries eCommerce template."
       />
 
       <LayoutOne headerTop="visible">

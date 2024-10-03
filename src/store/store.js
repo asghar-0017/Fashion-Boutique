@@ -18,7 +18,7 @@ import wishlistReducer from "./slices/wishlist-slice";
 
 // Redux Persist Configuration
 const persistConfig = {
-    key: "flone",  // Key for storing data in localStorage
+    key: "Needs and Luxuries",  // Key for storing data in localStorage
     version: 1.1,  // Versioning your persisted store
     storage,       // The storage engine (localStorage here)
     blacklist: ["product"],  // Don't persist the product slice

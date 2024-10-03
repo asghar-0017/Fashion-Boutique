@@ -6,7 +6,8 @@ const Logo = ({ imageUrl, logoClass }) => {
   return (
     <div className={clsx(logoClass)}>
       <Link to={process.env.PUBLIC_URL + "/"}>
-        <img alt="" src={process.env.PUBLIC_URL + imageUrl} />
+        {/* <img alt="" src={process.env.PUBLIC_URL + imageUrl} /> */}
+        <h4 style={{fontWeight: "bold", color: "#313131"}}>Needs and Luxuries</h4>
       </Link>
     </div>
   );
