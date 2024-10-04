@@ -148,7 +148,6 @@ const FooterOne = ({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Youtube
                     </a>
                   </li>
                 </ul>
