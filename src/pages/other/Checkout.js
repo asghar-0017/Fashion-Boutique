@@ -33,6 +33,7 @@ const Checkout = () => {
       price: item.price,
       name: item.title,
       Imageurl: item.Imageurl,
+      title:item.title
     }));    
 
     const billingDetails = {
@@ -46,6 +47,7 @@ const Checkout = () => {
       additionalInformation: data.additionalInfo,
       products: products,
     };    
+    console.log("BillingData",billingDetails)
 
     try {
       const response = await axios.post(`${apiKey}/create-billing-detail`, billingDetails, {
@@ -53,6 +55,7 @@ const Checkout = () => {
           "Content-Type": "application/json",
         },
       });
+      console.log("Response",response)
       Swal.fire({
         title: "Success!",
         text: "Order placed successfully.",
