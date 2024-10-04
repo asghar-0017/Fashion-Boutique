@@ -19,6 +19,7 @@ const Checkout = () => {
   const dispatch = useDispatch(); 
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
+  console.log("CartItem",cartItems)
 
   const {
     register,
@@ -28,13 +29,14 @@ const Checkout = () => {
 
   const onSubmit = async (data) => {
     const products = cartItems.map((item) => ({
-      // productId: item._id, 
+      productId: item._id,
       quantity: item.quantity,
       price: item.price,
       name: item.title,
       Imageurl: item.Imageurl,
-      title:item.title
-    }));    
+      title: item.title
+    }));
+    console.log("Products",products)  
 
     const billingDetails = {
       firstName: data.firstName,
