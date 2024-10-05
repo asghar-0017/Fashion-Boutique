@@ -5,7 +5,6 @@ import { getProductCartQuantity } from "../../helpers/product";
 import Rating from "./sub-components/ProductRating";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
-import { addToCompare } from "../../store/slices/compare-slice";
 import cogoToast from "cogo-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -17,13 +16,9 @@ const ProductDescriptionInfo = ({
   finalProductPrice,
   cartItems,
   wishlistItem,
-  compareItem,
 }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
-
-  // console.log(product);
-  
+  const navigate = useNavigate();
 
   // Initialize state with product variations
   const initialColor = product?.variations?.[0]?.color || "";
@@ -36,7 +31,7 @@ const ProductDescriptionInfo = ({
   const [productStock, setProductStock] = useState(initialStock);
   const [quantityCount, setQuantityCount] = useState(1);
 
-  // Calculate product cart quantity and total price
+  // Calculate product cart quantity
   const productCartQty = getProductCartQuantity(
     cartItems,
     product,
@@ -44,14 +39,12 @@ const ProductDescriptionInfo = ({
     selectedProductSize
   );
 
-  
-  
+  // Calculate total price based on discounted price
   const totalPrice =
-  !isNaN(discountedPrice) && discountedPrice !== null
-  ? parseFloat(finalDiscountedPrice)
-  : parseFloat(finalProductPrice);
-  
-  // console.log(finalProductPrice);
+    !isNaN(discountedPrice) && discountedPrice !== null
+      ? parseFloat(finalDiscountedPrice)
+      : parseFloat(finalProductPrice);
+
   const calculatedTotalPrice = totalPrice * quantityCount;
 
   // Handler for adding item to cart
@@ -59,16 +52,19 @@ const ProductDescriptionInfo = ({
     dispatch(
       addToCart({
         ...product,
-        discountprice: calculatedTotalPrice,
-        price: (finalProductPrice * quantityCount).toFixed(2),
-        quantity: quantityCount, 
+        discountprice: discountedPrice ? finalDiscountedPrice : finalProductPrice,
+        price: totalPrice.toFixed(2),
+        quantity: quantityCount,
+        selectedColor: selectedProductColor,
+        selectedSize: selectedProductSize,
       })
     );
+    cogoToast.success("Added to Cart!");
   };
 
   const handleBuyNow = () => {
-    handleAddToCart()
-    navigate("/checkout")
+    handleAddToCart();
+    navigate("/checkout");
   };
 
   // Handler for adding item to wishlist
@@ -76,15 +72,6 @@ const ProductDescriptionInfo = ({
     dispatch(addToWishlist(product));
     cogoToast.success("Added to Wishlist!");
   };
-
-  // Handler for adding item to compare
-  // const handleAddToCompare = () => {
-  //   dispatch(addToCompare(product));
-  //   cogoToast.success("Added to Compare!");
-  // };
-
-  console.log(quantityCount);
-  
 
   return (
     <div className="product-details-content ml-70">
@@ -95,7 +82,7 @@ const ProductDescriptionInfo = ({
         </span>
         {discountedPrice !== null && (
           <span className="old">
-            {currency.currencySymbol + (finalProductPrice * quantityCount).toFixed(2)}
+            {currency.currencySymbol + (totalPrice * quantityCount).toFixed(2)}
           </span>
         )}
       </div>
@@ -200,22 +187,21 @@ const ProductDescriptionInfo = ({
           <button onClick={handleBuyNow}>Buy Now</button>
         </div>
 
-        {/* Wishlist and Compare Icons */}
-          <div className="pro-details-wishlist">
-            <button
-              className={wishlistItem !== undefined ? "active" : ""}
-              disabled={wishlistItem !== undefined}
-              title={
-                wishlistItem !== undefined
-                  ? "Added to wishlist"
-                  : "Add to wishlist"
-              }
-              onClick={handleAddToWishlist}
-            >
-              <i className="pe-7s-like" />
-            </button>
-          </div>
-          
+        {/* Wishlist Icon */}
+        <div className="pro-details-wishlist">
+          <button
+            className={wishlistItem !== undefined ? "active" : ""}
+            disabled={wishlistItem !== undefined}
+            title={
+              wishlistItem !== undefined
+                ? "Added to wishlist"
+                : "Add to wishlist"
+            }
+            onClick={handleAddToWishlist}
+          >
+            <i className="pe-7s-like" />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -229,7 +215,6 @@ ProductDescriptionInfo.propTypes = {
   finalProductPrice: PropTypes.number.isRequired,
   cartItems: PropTypes.array.isRequired,
   wishlistItem: PropTypes.object,
-  compareItem: PropTypes.object,
 };
 
 export default ProductDescriptionInfo;

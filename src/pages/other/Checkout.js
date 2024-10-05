@@ -214,7 +214,7 @@ const Checkout = () => {
                           <div className="your-order-middle">
                             <ul>
                               {cartItems.map((cartItem, key) => {
-                                const discountedPrice = getDiscountPrice(cartItem.price, cartItem.discount);
+                                const discountedPrice = getDiscountPrice(cartItem.discountprice);
                                 const finalProductPrice = (cartItem.price * currency.currencyRate).toFixed(2);
                                 const finalDiscountedPrice = (discountedPrice * currency.currencyRate).toFixed(2);
 
