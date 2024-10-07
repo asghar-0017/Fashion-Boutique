@@ -4,38 +4,55 @@ import { useEffect, useState } from "react";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import axios from "axios";
-import API_CONFIG from '../../config/Api/api'
+import API_CONFIG from '../../config/Api/api';
 
 const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
+  const [information, setInformation] = useState({});
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({
     name: "",
     email: "",
     message: "",
-    rating: 5, 
+    rating: 5,
   });
-  const [isLoading, setIsLoading] = useState(true); 
-  const [error, setError] = useState(null); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const { apiKey } = API_CONFIG;
 
     const fetchReviews = async () => {
       try {
-        const response = await axios.get(
-          `${apiKey}/get-reviews/${product._id}`
-        );
-        console.log("Fetched Reviews:", response);
-        setReviews(response.data.data || []); 
+        const response = await axios.get(`${apiKey}/get-reviews/${product._id}`);
+        setReviews(response.data.data || []);
       } catch (error) {
         console.error("Failed to fetch reviews:", error);
         setError("Failed to load reviews. Please try again.");
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     };
 
     fetchReviews();
+  }, [product._id]);
+
+  useEffect(() => {
+    const { apiKey } = API_CONFIG;
+
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get(`${apiKey}/get-product/${product._id}`);
+        setInformation(response.data.data || {});
+        console.log("Response", response);
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+        setError("Failed to load product information. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
   }, [product._id]);
 
   const handleSubmitReview = async (e) => {
@@ -45,8 +62,8 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
       name: newReview.name,
       email: newReview.email,
       rating: newReview.rating,
-      reviewMessage: newReview.message, 
-      productId: product._id, 
+      reviewMessage: newReview.message,
+      productId: product._id,
     };
 
     try {
@@ -57,11 +74,10 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
         reviewData
       );
       setReviews((prevReviews) => [...prevReviews, response.data.data]);
-      setNewReview({ name: "", email: "", message: "", rating: 1 }); 
-      console.log("Submitted Review:", response);
+      setNewReview({ name: "", email: "", message: "", rating: 5 });
     } catch (error) {
       console.error("Failed to submit review:", error);
-      alert("Failed to submit review. Please try again."); 
+      alert("Failed to submit review. Please try again.");
     }
   };
 
@@ -72,41 +88,30 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
           <Tab.Container defaultActiveKey="productDescription">
             <Nav variant="pills" className="description-review-topbar">
               <Nav.Item>
-                <Nav.Link eventKey="additionalInfo">
-                  Additional Information
-                </Nav.Link>
+                <Nav.Link eventKey="additionalInfo">Additional Information</Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="productDescription">Description</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="productReviews">
-                  Reviews ({reviews.length})
-                </Nav.Link>
+                <Nav.Link eventKey="productReviews">Reviews ({reviews.length})</Nav.Link>
               </Nav.Item>
             </Nav>
             <Tab.Content className="description-review-bottom">
               <Tab.Pane eventKey="additionalInfo">
                 <div className="product-anotherinfo-wrapper">
                   <ul>
+                    <li><span>Weight:</span> {information.weight || "N/A"} g</li>
                     <li>
-                      <span>Weight</span> 400 g
+                      <span>Materials:</span> 
+                      {information.materials ? information.materials.join(', ') : "N/A"}
                     </li>
-                    <li>
-                      <span>Dimensions</span> 10 x 10 x 15 cm
-                    </li>
-                    <li>
-                      <span>Materials</span> 60% cotton, 40% polyester
-                    </li>
-                    <li>
-                      <span>Other Info</span> American heirloom jean shorts pug
-                      seitan letterpress
-                    </li>
+                    <li><span>Other Info:</span> {information.otherInfo ||  "American heirloom jean shorts pug seitan letterpress"}</li>
                   </ul>
                 </div>
               </Tab.Pane>
               <Tab.Pane eventKey="productDescription">
-                <p>{product.description}</p>
+                <p>{product.description || "No description available"}</p>
               </Tab.Pane>
               <Tab.Pane eventKey="productReviews">
                 <div className="row">
@@ -117,11 +122,8 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
                       ) : error ? (
                         <p>{error}</p>
                       ) : reviews.length > 0 ? (
-                        reviews.map((review, index) => {
-                          if (!review || !review.name) {
-                            return null; 
-                          }
-                          return (
+                        reviews.map((review, index) => (
+                          review?.name && (
                             <div key={index} className="single-review">
                               <div className="review-content">
                                 <div className="review-top-wrap">
@@ -141,8 +143,8 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
                                 </div>
                               </div>
                             </div>
-                          );
-                        })
+                          )
+                        ))
                       ) : (
                         <p>No reviews yet.</p>
                       )}
@@ -153,27 +155,19 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
                       <h3>Add a Review</h3>
                       <div className="ratting-form">
                         <form onSubmit={handleSubmitReview}>
-                        <div className="star-box">
-                        <span>Your rating:</span>
-                        <div className="ratting-star">
-                          {[...Array(5)].map((_, i) => (
-                            <i
-                              key={i}
-                              className={`fa fa-star ${i < newReview.rating ? "selected" : ""}`}
-                              style={{
-                                cursor: "pointer",
-                                color: i < newReview.rating ? "#FFD700" : "#ccc", 
-                              }}
-                              onClick={() =>
-                                setNewReview({
-                                  ...newReview,
-                                  rating: i + 1,
-                                })
-                              }
-                            />
-                          ))}
-                        </div>
-                      </div>
+                          <div className="star-box">
+                            <span>Your rating:</span>
+                            <div className="ratting-star">
+                              {[...Array(5)].map((_, i) => (
+                                <i
+                                  key={i}
+                                  className={`fa fa-star ${i < newReview.rating ? "selected" : ""}`}
+                                  style={{ cursor: "pointer", color: i < newReview.rating ? "#FFD700" : "#ccc" }}
+                                  onClick={() => setNewReview({ ...newReview, rating: i + 1 })}
+                                />
+                              ))}
+                            </div>
+                          </div>
                           <div className="row">
                             <div className="col-md-6">
                               <div className="rating-form-style mb-10">
@@ -181,12 +175,7 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
                                   placeholder="Name"
                                   type="text"
                                   value={newReview.name}
-                                  onChange={(e) =>
-                                    setNewReview({
-                                      ...newReview,
-                                      name: e.target.value,
-                                    })
-                                  }
+                                  onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
                                   required
                                 />
                               </div>
@@ -197,12 +186,7 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
                                   placeholder="Email"
                                   type="email"
                                   value={newReview.email}
-                                  onChange={(e) =>
-                                    setNewReview({
-                                      ...newReview,
-                                      email: e.target.value,
-                                    })
-                                  }
+                                  onChange={(e) => setNewReview({ ...newReview, email: e.target.value })}
                                   required
                                 />
                               </div>
@@ -212,12 +196,7 @@ const ProductDescriptionTab = ({ spaceBottomClass, product }) => {
                                 <textarea
                                   placeholder="Message"
                                   value={newReview.message}
-                                  onChange={(e) =>
-                                    setNewReview({
-                                      ...newReview,
-                                      message: e.target.value,
-                                    })
-                                  }
+                                  onChange={(e) => setNewReview({ ...newReview, message: e.target.value })}
                                   required
                                 />
                                 <input type="submit" value="Submit" />

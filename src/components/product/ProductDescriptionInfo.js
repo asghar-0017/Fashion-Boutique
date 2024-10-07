@@ -31,7 +31,6 @@ const ProductDescriptionInfo = ({
   const [productStock, setProductStock] = useState(initialStock);
   const [quantityCount, setQuantityCount] = useState(1);
 
-  // Calculate product cart quantity
   const productCartQty = getProductCartQuantity(
     cartItems,
     product,
@@ -39,7 +38,6 @@ const ProductDescriptionInfo = ({
     selectedProductSize
   );
 
-  // Calculate total price based on discounted price
   const totalPrice =
     !isNaN(discountedPrice) && discountedPrice !== null
       ? parseFloat(finalDiscountedPrice)
@@ -47,13 +45,11 @@ const ProductDescriptionInfo = ({
 
   const calculatedTotalPrice = totalPrice * quantityCount;
 
-  // Handler for adding item to cart
   const handleAddToCart = () => {
     dispatch(
       addToCart({
         ...product,
         discountprice: discountedPrice ? finalDiscountedPrice : finalProductPrice,
-        price: totalPrice.toFixed(2),
         quantity: quantityCount,
         selectedColor: selectedProductColor,
         selectedSize: selectedProductSize,
@@ -67,11 +63,19 @@ const ProductDescriptionInfo = ({
     navigate("/checkout");
   };
 
-  // Handler for adding item to wishlist
   const handleAddToWishlist = () => {
-    dispatch(addToWishlist(product));
+    dispatch(
+      addToWishlist({
+        ...product,
+        discountprice: discountedPrice ? finalDiscountedPrice : finalProductPrice,
+        selectedColor: selectedProductColor,
+        selectedSize: selectedProductSize,
+      })
+    );
+    console.log("Add To WishList",addToWishlist)
     cogoToast.success("Added to Wishlist!");
   };
+  
 
   return (
     <div className="product-details-content ml-70">
@@ -82,7 +86,7 @@ const ProductDescriptionInfo = ({
         </span>
         {discountedPrice !== null && (
           <span className="old">
-            {currency.currencySymbol + (totalPrice * quantityCount).toFixed(2)}
+            {currency.currencySymbol + (product.price).toFixed(2)}
           </span>
         )}
       </div>
@@ -187,7 +191,6 @@ const ProductDescriptionInfo = ({
           <button onClick={handleBuyNow}>Buy Now</button>
         </div>
 
-        {/* Wishlist Icon */}
         <div className="pro-details-wishlist">
           <button
             className={wishlistItem !== undefined ? "active" : ""}
