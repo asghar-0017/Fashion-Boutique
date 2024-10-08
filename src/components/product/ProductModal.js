@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
 import Rating from "./sub-components/ProductRating";
+import './productModal.css'; // External CSS file for styling
 
 const ProductModal = ({
   show,
@@ -25,43 +26,45 @@ const ProductModal = ({
 
   const totalPrice = discountPrice > 0 ? discountPrice * quantity : productPrice * quantity;
 
-  // console.log("Product Price:", productPrice);
-  // console.log("Discounted Price:", discountPrice);
-  // console.log("Total Price:", totalPrice);
-
   const handleAddToCart = () => {
     dispatch(
       addToCart({
         ...product,
         price: productPrice,
         discountprice: discountPrice,
-        quantity: quantity, 
+        quantity: quantity,
       })
     );
-    onHide(); 
+    onHide();
   };
 
-  // console.log(quantity);
-  
+  const handleAddToWishlist = () => {
+    dispatch(
+      addToWishlist({
+        ...product,
+        price: productPrice,
+        discountprice: discountPrice,
+      })
+    );
+    onHide();
+  };
 
-  // Handle change in quantity
   const handleQuantityChange = (e) => {
     const newQty = parseInt(e.target.value);
-    
     if (!isNaN(newQty) && newQty > 0) {
       setQuantity(newQty);
     }
   };
 
   return (
-    <Modal show={show} onHide={onHide} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>{product.title}</Modal.Title>
+    <Modal show={show} onHide={onHide} centered className="custom-modal">
+      <Modal.Header closeButton className="modal-header-custom">
+        <Modal.Title className="modal-title-custom">{product.title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="product-modal">
-          <div className="product-image">
-            <img src={product.Imageurl} alt={product.title} />
+        <div className="product-modal-body">
+          <div className="product-image-container">
+            <img className="product-image" src={product.Imageurl} alt={product.title} />
           </div>
           <div className="product-details">
             <h4 className="product-title">{product.title}</h4>
@@ -81,7 +84,9 @@ const ProductModal = ({
                   </span>
                 </div>
               ) : (
-                <span>{currency.currencySymbol + productPrice.toFixed(2)}</span>
+                <span className="normal-price">
+                  {currency.currencySymbol + productPrice.toFixed(2)}
+                </span>
               )}
             </div>
             <p className="product-description">{product.description}</p>
@@ -94,6 +99,7 @@ const ProductModal = ({
                 min="1"
                 value={quantity}
                 onChange={handleQuantityChange}
+                className="quantity-input"
               />
             </Form.Group>
 
@@ -105,11 +111,11 @@ const ProductModal = ({
           </div>
         </div>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="primary" onClick={handleAddToCart}>
+      <Modal.Footer className="modal-footer-custom">
+        <Button className="btn-add-to-cart" onClick={handleAddToCart}>
           Add to Cart
         </Button>
-        <Button variant="secondary" onClick={() => dispatch(addToWishlist(product))}>
+        <Button className="btn-add-to-wishlist" onClick={handleAddToWishlist}>
           Add to Wishlist
         </Button>
       </Modal.Footer>

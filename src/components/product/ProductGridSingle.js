@@ -40,8 +40,8 @@ const ProductGridSingle = ({
     dispatch(
       addToCart({
         ...product,
-        price: +basePrice, // Use base price
-        discountprice: +finalDiscountedPrice, // Use discounted price if available
+        price: +basePrice,
+        discountprice: +finalDiscountedPrice,
       })
     );
   };

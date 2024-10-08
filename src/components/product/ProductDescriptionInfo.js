@@ -20,7 +20,6 @@ const ProductDescriptionInfo = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Initialize state with product variations
   const initialColor = product?.variations?.[0]?.color || "";
   const initialSize = product?.variations?.[0]?.sizes?.[0]?.name || "";
   const initialStock =
