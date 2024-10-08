@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
 import Rating from "./sub-components/ProductRating";
-import './productModal.css'; // External CSS file for styling
+import "./productModal.css"; // External CSS file for styling
 
 const ProductModal = ({
   show,
@@ -22,9 +22,12 @@ const ProductModal = ({
   const [quantity, setQuantity] = useState(1);
 
   const productPrice = finalProductPrice ? parseFloat(finalProductPrice) : 0;
-  const discountPrice = finalDiscountedPrice ? parseFloat(finalDiscountedPrice) : 0;
+  const discountPrice = finalDiscountedPrice
+    ? parseFloat(finalDiscountedPrice)
+    : 0;
 
-  const totalPrice = discountPrice > 0 ? discountPrice * quantity : productPrice * quantity;
+  const totalPrice =
+    discountPrice > 0 ? discountPrice * quantity : productPrice * quantity;
 
   const handleAddToCart = () => {
     dispatch(
@@ -59,12 +62,18 @@ const ProductModal = ({
   return (
     <Modal show={show} onHide={onHide} centered className="custom-modal">
       <Modal.Header closeButton className="modal-header-custom">
-        <Modal.Title className="modal-title-custom">{product.title}</Modal.Title>
+        <Modal.Title className="modal-title-custom">
+          {product.title}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="product-modal-body">
           <div className="product-image-container">
-            <img className="product-image" src={product.Imageurl} alt={product.title} />
+            <img
+              className="product-image"
+              src={product.Imageurl}
+              alt={product.title}
+            />
           </div>
           <div className="product-details">
             <h4 className="product-title">{product.title}</h4>
@@ -79,9 +88,12 @@ const ProductModal = ({
                   <span className="discounted-price">
                     {currency.currencySymbol + discountPrice.toFixed(2)}
                   </span>
-                  <span className="old-price">
-                    {currency.currencySymbol + productPrice.toFixed(2)}
-                  </span>
+
+                  {productPrice != discountPrice && (
+                    <span className="old-price">
+                      {currency.currencySymbol + productPrice.toFixed(2)}
+                    </span>
+                  )}
                 </div>
               ) : (
                 <span className="normal-price">

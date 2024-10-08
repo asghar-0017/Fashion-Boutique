@@ -66,6 +66,7 @@ const ProductGridSingle = ({
               className="default-img"
               src={product.Imageurl}
               alt={product.title}
+              style={{height: "320px", width: "100%"}}
             />
           </Link>
           {product.discountprice && (

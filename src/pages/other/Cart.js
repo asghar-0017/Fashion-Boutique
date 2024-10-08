@@ -109,10 +109,12 @@ const Cart = () => {
                                         {currency.currencySymbol +
                                           finalProductPrice.toFixed(2)}
                                       </span>
+                                      {finalProductPrice != finalDiscountedPrice && (
                                       <span className="amount">
                                         {currency.currencySymbol +
                                           finalDiscountedPrice.toFixed(2)}
                                       </span>
+                                      )}
                                     </Fragment>
                                   ) : (
                                     <span className="amount">

@@ -105,12 +105,14 @@ const Wishlist = () => {
                                 <td className="product-price-cart">
                                   {finalDiscountedPrice !== null ? (
                                     <Fragment>
+                                      <span className="amount">
+                                        {currency.currencySymbol + finalDiscountedPrice}
+                                      </span>&nbsp;
+                                      {finalProductPrice != finalDiscountedPrice && (
                                       <span className="amount old">
                                         {currency.currencySymbol + finalProductPrice}
                                       </span>
-                                      <span className="amount">
-                                        {currency.currencySymbol + finalDiscountedPrice}
-                                      </span>
+                                      )}
                                     </Fragment>
                                   ) : (
                                     <span className="amount">

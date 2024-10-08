@@ -56,9 +56,11 @@ const MenuCart = () => {
                           <span>
                             {currency.currencySymbol + finalProductPrice.toFixed(2)}
                           </span>{" "}
+                          {finalProductPrice != (item.price * currency.currencyRate) && (
                           <span style={{ textDecoration: 'line-through' }}>
                             {currency.currencySymbol + (item.price * currency.currencyRate).toFixed(2)}
                           </span>
+                          )}
                         </>
                       ) : (
                         `${currency.currencySymbol}${(item.price * currency.currencyRate).toFixed(2)}`
