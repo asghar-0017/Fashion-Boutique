@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form"; 
@@ -10,6 +10,9 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import API_CONFIG from "../../config/Api/api";
 import axios from "axios";
 import Swal from "sweetalert2";
+import CreditCardForm from "../../components/credit-card/credit-card";
+import { CreditCardContext } from "../../context/cardContext";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 const Checkout = () => {
   let cartTotalPrice = 0;
@@ -20,7 +23,8 @@ const Checkout = () => {
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
   console.log("CartItem",cartItems)
-
+  const { cardDetails } = useContext(CreditCardContext);  
+  const [isCOD, setIsCOD] = useState(false);
   const {
     register,
     handleSubmit,
@@ -197,6 +201,20 @@ const Checkout = () => {
                           />
                         </div>
                       </div>
+
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={isCOD}
+                            onChange={(e) => setIsCOD(e.target.checked)}
+                            color="primary"
+                          />
+                        }
+                        label="Cash on Delivery"
+                      />
+
+                      {/* Conditionally render the CreditCardForm based on isCOD */}
+                      {!isCOD && <CreditCardForm />}
                     </div>
                   </div>
 

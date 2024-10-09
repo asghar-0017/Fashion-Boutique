@@ -13,6 +13,7 @@ import "./assets/scss/style.scss";
 import "./i18n";
 import API_CONFIG from "./config/Api/api";
 import axios from "axios";
+import { CreditCardProvider } from "./context/cardContext";
 
 // Define the fetchProducts function
 const fetchProducts = async () => {
@@ -39,7 +40,9 @@ root.render(
   <Provider store={store}>
     <PersistProvider>
       <React.StrictMode>
+      <CreditCardProvider>
         <App />
+        </CreditCardProvider>
       </React.StrictMode>
     </PersistProvider>
   </Provider>
