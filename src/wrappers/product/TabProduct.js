@@ -8,6 +8,7 @@ import axios from "axios";
 import API_CONFIG from "../../config/Api/api";
 import { useEffect, useState } from "react";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 const TabProduct = ({
   spaceTopClass,
@@ -15,6 +16,10 @@ const TabProduct = ({
   bgColorClass,
   category,
 }) => {
+  const location = useLocation();
+  const isShopGridNoSidebar = location.pathname.includes(
+    "/shop-grid-no-sidebar"
+  );
   const { apiKey } = API_CONFIG;
   const [filterCollection, setFilterCollection] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -23,7 +28,7 @@ const TabProduct = ({
     const fetchDataFromApi = async () => {
       try {
         const response = await axios.get(`${apiKey}/get-product-collection`);
-        setFilterCollection(response.data.collections); 
+        setFilterCollection(response.data.collections);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -46,22 +51,26 @@ const TabProduct = ({
       )}
     >
       <div className="container">
-        <SectionTitle titleText="DAILY DEALS!" positionClass="text-center" />
-        <FormControl sx={{ m: 2, minWidth: 180 }}>
-          <InputLabel>Collections</InputLabel>
-          <Select
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-            label="Collections"
-          >
-            <MenuItem value="All">All</MenuItem>
-            {filterCollection.map((collection, index) => (
-              <MenuItem key={index} value={collection}>
-                {collection}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        {isShopGridNoSidebar && (
+          <FormControl sx={{ m: 2, minWidth: 180 }}>
+            <InputLabel>Collections</InputLabel>
+            <Select
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              label="Collections"
+            >
+              <MenuItem value="All">All</MenuItem>
+              {filterCollection.map((collection, index) => (
+                <MenuItem key={index} value={collection}>
+                  {collection}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+        {!isShopGridNoSidebar && (
+          <SectionTitle titleText="DAILY DEALS!" positionClass="text-center" />
+        )}
         <Tab.Container defaultActiveKey="bestSeller">
           <Tab.Content>
             <div className="row" style={{ marginTop: "50px" }}>

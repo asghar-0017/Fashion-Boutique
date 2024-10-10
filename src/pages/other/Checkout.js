@@ -1,7 +1,7 @@
 import { Fragment, useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm } from "react-hook-form"; 
+import { useForm } from "react-hook-form";
 import { clearCart } from "../../store/slices/cart-slice";
 import { getDiscountPrice } from "../../helpers/product";
 import SEO from "../../components/seo";
@@ -10,20 +10,24 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import API_CONFIG from "../../config/Api/api";
 import axios from "axios";
 import Swal from "sweetalert2";
-import CreditCardForm from "../../components/credit-card/credit-card";
-import { CreditCardContext } from "../../context/cardContext";
+// import CreditCardForm from "../../components/credit-card/credit-card";
+// import { CreditCardContext } from "../../context/cardContext";
 import { Checkbox, FormControlLabel } from "@mui/material";
 
 const Checkout = () => {
   let cartTotalPrice = 0;
   let { pathname } = useLocation();
-  let navigate = useNavigate()
+  let navigate = useNavigate();
   const { apiKey } = API_CONFIG;
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
-  console.log("CartItem",cartItems)
-  const { cardDetails } = useContext(CreditCardContext);  
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [accountNumber, setAccountNumber] = useState("1234567890");
+  const [imageError, setImageError] = useState("");
+  const [image, setImage] = useState(null);
+
+  // const { cardDetails } = useContext(CreditCardContext);
   const [isCOD, setIsCOD] = useState(false);
   const {
     register,
@@ -31,16 +35,33 @@ const Checkout = () => {
     formState: { errors },
   } = useForm();
 
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    setImage(file);
+    setImageError("");
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const onSubmit = async (data) => {
+    if (!isCOD && !image) {
+      setImageError("Image is required for online payments.");
+      return;
+    }
     const products = cartItems.map((item) => ({
       productId: item._id,
       quantity: item.quantity,
       price: item.price,
       name: item.title,
       Imageurl: item.Imageurl,
-      title: item.title
+      title: item.title,
     }));
-    console.log("Products",products)  
+    console.log("Products", products);
 
     const billingDetails = {
       firstName: data.firstName,
@@ -52,16 +73,21 @@ const Checkout = () => {
       email: data.email,
       additionalInformation: data.additionalInfo,
       products: products,
-    };    
-    console.log("BillingData",billingDetails)
+      image: image,
+    };
+    console.log("BillingData", billingDetails);
 
     try {
-      const response = await axios.post(`${apiKey}/create-billing-detail`, billingDetails, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("Response",response)
+      const response = await axios.post(
+        `${apiKey}/create-billing-detail`,
+        billingDetails,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Response", response);
       Swal.fire({
         title: "Success!",
         text: "Order placed successfully.",
@@ -74,7 +100,6 @@ const Checkout = () => {
       });
       console.log("Order placed successfully:", response.data);
       dispatch(clearCart());
-
     } catch (error) {
       Swal.fire({
         title: "Error!",
@@ -93,16 +118,16 @@ const Checkout = () => {
         description="Checkout page of Needs and Luxuries eCommerce template."
       />
       <LayoutOne headerTop="visible">
-        <Breadcrumb 
+        <Breadcrumb
           pages={[
-            {label: "Home", path: process.env.PUBLIC_URL + "/" },
-            {label: "Checkout", path: process.env.PUBLIC_URL + pathname }
-          ]} 
+            { label: "Home", path: process.env.PUBLIC_URL + "/" },
+            { label: "Checkout", path: process.env.PUBLIC_URL + pathname },
+          ]}
         />
         <div className="checkout-area pt-95 pb-100">
           <div className="container">
             {cartItems && cartItems.length >= 1 ? (
-              <form onSubmit={handleSubmit(onSubmit)}> 
+              <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row">
                   <div className="col-lg-7">
                     <div className="billing-info-wrap">
@@ -111,18 +136,36 @@ const Checkout = () => {
                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>First Name</label>
-                            <input type="text" {...register("firstName", { required: "First Name is required" })} />
-                            {errors.firstName && <span style={{color: "red"}}>{errors.firstName.message}</span>}
+                            <input
+                              type="text"
+                              {...register("firstName", {
+                                required: "First Name is required",
+                              })}
+                            />
+                            {errors.firstName && (
+                              <span style={{ color: "red" }}>
+                                {errors.firstName.message}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>Last Name</label>
-                            <input type="text" {...register("lastName", { required: "Last Name is required" })} />
-                            {errors.lastName && <span style={{color: "red"}}>{errors.lastName.message}</span>}
+                            <input
+                              type="text"
+                              {...register("lastName", {
+                                required: "Last Name is required",
+                              })}
+                            />
+                            {errors.lastName && (
+                              <span style={{ color: "red" }}>
+                                {errors.lastName.message}
+                              </span>
+                            )}
                           </div>
                         </div>
-                        
+
                         {/* <div className="col-lg-12">
                           <div className="billing-select mb-20">
                             <label>Country</label>
@@ -144,9 +187,15 @@ const Checkout = () => {
                               className="billing-address"
                               placeholder="House number and street name"
                               type="text"
-                              {...register("streetAddress", { required: "Street Address is required" })}
+                              {...register("streetAddress", {
+                                required: "Street Address is required",
+                              })}
                             />
-                            {errors.streetAddress && <span style={{color: "red"}}>{errors.streetAddress.message}</span>}
+                            {errors.streetAddress && (
+                              <span style={{ color: "red" }}>
+                                {errors.streetAddress.message}
+                              </span>
+                            )}
                             <input
                               placeholder="Apartment, suite, unit etc."
                               type="text"
@@ -157,36 +206,85 @@ const Checkout = () => {
                         <div className="col-lg-12">
                           <div className="billing-info mb-20">
                             <label>Town / City</label>
-                            <input type="text" {...register("city", { required: "City is required" })} />
-                            {errors.city && <span style={{color: "red"}}>{errors.city.message}</span>}
+                            <input
+                              type="text"
+                              {...register("city", {
+                                required: "City is required",
+                              })}
+                            />
+                            {errors.city && (
+                              <span style={{ color: "red" }}>
+                                {errors.city.message}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>State / County</label>
-                            <input type="text" {...register("state", { required: "State is required" })} />
-                            {errors.state && <span style={{color: "red"}}>{errors.state.message}</span>}
+                            <input
+                              type="text"
+                              {...register("state", {
+                                required: "State is required",
+                              })}
+                            />
+                            {errors.state && (
+                              <span style={{ color: "red" }}>
+                                {errors.state.message}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>Postcode / ZIP</label>
-                            <input type="text" {...register("postcode", { required: "Postcode is required" })} />
-                            {errors.postcode && <span style={{color: "red"}}>{errors.postcode.message}</span>}
+                            <input
+                              type="text"
+                              {...register("postcode", {
+                                required: "Postcode is required",
+                              })}
+                            />
+                            {errors.postcode && (
+                              <span style={{ color: "red" }}>
+                                {errors.postcode.message}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>Phone</label>
-                            <input type="text" {...register("phone", { required: "Phone is required" })} />
-                            {errors.phone && <span style={{color: "red"}}>{errors.phone.message}</span>}
+                            <input
+                              type="text"
+                              {...register("phone", {
+                                required: "Phone is required",
+                              })}
+                            />
+                            {errors.phone && (
+                              <span style={{ color: "red" }}>
+                                {errors.phone.message}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>Email Address</label>
-                            <input type="email" {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Email is not valid" } } )} />
-                            {errors.email && <span style={{color: "red"}}>{errors.email.message}</span>}
+                            <input
+                              type="email"
+                              {...register("email", {
+                                required: "Email is required",
+                                pattern: {
+                                  value: /^\S+@\S+$/i,
+                                  message: "Email is not valid",
+                                },
+                              })}
+                            />
+                            {errors.email && (
+                              <span style={{ color: "red" }}>
+                                {errors.email.message}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -213,8 +311,46 @@ const Checkout = () => {
                         label="Cash on Delivery"
                       />
 
-                      {/* Conditionally render the CreditCardForm based on isCOD */}
-                      {!isCOD && <CreditCardForm />}
+                      {!isCOD && (
+                        <div className="cod-upload-section">
+                          <div className="form-group">
+                            <label htmlFor="imageUpload">
+                              Upload Payment Proof Image
+                            </label>
+                            <input
+                              type="file"
+                              id="imageUpload"
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              className="form-control"
+                            />
+                            {imageError && (
+                                <span style={{ color: "red" }}>
+                                  {imageError}
+                                </span>
+                              )}
+                          </div>
+
+                          {uploadedImage && (
+                            <div className="image-preview mt-2">
+                              <h5>Uploaded Image:</h5>
+                              <img
+                                src={uploadedImage}
+                                alt="Uploaded preview"
+                                style={{
+                                  width: "100%",
+                                  maxWidth: "300px",
+                                  height: "auto",
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          <div className="account-number mt-2">
+                            <h3 style={{fontWeight: "bold"}}>Account Number: {accountNumber}</h3>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -232,13 +368,21 @@ const Checkout = () => {
                           <div className="your-order-middle">
                             <ul>
                               {cartItems.map((cartItem, key) => {
-                                const discountedPrice = getDiscountPrice(cartItem.discountprice);
-                                const finalProductPrice = (cartItem.price * currency.currencyRate).toFixed(2);
-                                const finalDiscountedPrice = (discountedPrice * currency.currencyRate).toFixed(2);
+                                const discountedPrice = getDiscountPrice(
+                                  cartItem.discountprice
+                                );
+                                const finalProductPrice = (
+                                  cartItem.price * currency.currencyRate
+                                ).toFixed(2);
+                                const finalDiscountedPrice = (
+                                  discountedPrice * currency.currencyRate
+                                ).toFixed(2);
 
                                 discountedPrice != null
-                                  ? (cartTotalPrice += finalDiscountedPrice * cartItem.quantity)
-                                  : (cartTotalPrice += finalProductPrice * cartItem.quantity);
+                                  ? (cartTotalPrice +=
+                                      finalDiscountedPrice * cartItem.quantity)
+                                  : (cartTotalPrice +=
+                                      finalProductPrice * cartItem.quantity);
                                 return (
                                   <li key={key}>
                                     <span className="order-middle-left">
@@ -246,8 +390,16 @@ const Checkout = () => {
                                     </span>{" "}
                                     <span className="order-price">
                                       {discountedPrice !== null
-                                        ? currency.currencySymbol + (finalDiscountedPrice * cartItem.quantity).toFixed(2)
-                                        : currency.currencySymbol + (finalProductPrice * cartItem.quantity).toFixed(2)}
+                                        ? currency.currencySymbol +
+                                          (
+                                            finalDiscountedPrice *
+                                            cartItem.quantity
+                                          ).toFixed(2)
+                                        : currency.currencySymbol +
+                                          (
+                                            finalProductPrice *
+                                            cartItem.quantity
+                                          ).toFixed(2)}
                                     </span>
                                   </li>
                                 );
@@ -264,7 +416,8 @@ const Checkout = () => {
                             <ul>
                               <li className="order-total">Total</li>
                               <li>
-                                {currency.currencySymbol + cartTotalPrice.toFixed(2)}
+                                {currency.currencySymbol +
+                                  cartTotalPrice.toFixed(2)}
                               </li>
                             </ul>
                           </div>
@@ -272,7 +425,9 @@ const Checkout = () => {
                         <div className="payment-method"></div>
                       </div>
                       <div className="place-order mt-25">
-                        <button type="submit" className="btn-hover">Place Order</button> 
+                        <button type="submit" className="btn-hover">
+                          Place Order
+                        </button>
                       </div>
                     </div>
                   </div>
