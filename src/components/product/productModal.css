@@ -112,3 +112,27 @@
     background-color: #e0a800;
   }
   
+  .btn-add-to-cart {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, cursor 0.3s ease;
+  }
+  
+  .btn-add-to-cart.out-of-stock {
+    background-color: #d9534f;
+    pointer-events: auto! important;
+    cursor: not-allowed !important; 
+    color: white;
+  }
+  
+  .btn-add-to-cart.out-of-stock:hover {
+    background-color: #433a3a; 
+  }
+  
+  .btn-add-to-cart:disabled {
+    cursor: not-allowed;
+    background-color: #433a3a;
+  }
+  
+  

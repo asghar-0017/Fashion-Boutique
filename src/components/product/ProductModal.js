@@ -103,7 +103,6 @@ const ProductModal = ({
             </div>
             <p className="product-description">{product.description}</p>
 
-            {/* Quantity Input */}
             <Form.Group controlId="quantityInput">
               <Form.Label>Quantity</Form.Label>
               <Form.Control
@@ -115,7 +114,6 @@ const ProductModal = ({
               />
             </Form.Group>
 
-            {/* Display Quantity and Total Price */}
             <div className="product-total">
               <p>Qty: {quantity}</p>
               <p>Total: {currency.currencySymbol + totalPrice.toFixed(2)}</p>
@@ -124,9 +122,13 @@ const ProductModal = ({
         </div>
       </Modal.Body>
       <Modal.Footer className="modal-footer-custom">
-        <Button className="btn-add-to-cart" onClick={handleAddToCart}>
-          Add to Cart
-        </Button>
+      <Button
+  className={`btn-add-to-cart ${product.stockStatus === "Out of Stock" ? "out-of-stock" : ""}`}
+  onClick={handleAddToCart}
+  disabled={product.stockStatus === "Out of Stock"} // Disable the button if out of stock
+>
+  {product.stockStatus === "Out of Stock" ? "Out of Stock" : "Add to Cart"}
+</Button>
         <Button className="btn-add-to-wishlist" onClick={handleAddToWishlist}>
           Add to Wishlist
         </Button>

@@ -18,6 +18,9 @@ const ProductGrid = ({ spaceBottomClass, category, type, limit }) => {
       ? products.filter((product) => product.collection === category)
       : products;
 
+      console.log(products);
+      
+
   return (
     <Fragment>
       {filteredProducts?.length > 0 ? (

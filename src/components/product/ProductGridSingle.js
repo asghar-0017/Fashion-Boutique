@@ -30,7 +30,7 @@ const ProductGridSingle = ({
 }) => {
   const [modalShow, setModalShow] = useState(false);
   const dispatch = useDispatch();
-
+  
   const { basePrice, finalDiscountedPrice } = calculatePrices(
     product,
     currency.currencyRate
@@ -82,9 +82,13 @@ const ProductGridSingle = ({
               </button>
             </div>
             <div className="pro-same-action pro-cart">
+            {product.stockStatus && product.stockStatus == "In Stock" ? (
               <button onClick={() => handleAddToCart(product)}>
                 <i className="pe-7s-cart"></i> Add to cart
               </button>
+               ) : (
+                <button disabled>Out of Stock</button>
+              )}
             </div>
             <div className="pro-same-action pro-quickview">
               <button title="Quick View" onClick={() => setModalShow(true)}>
