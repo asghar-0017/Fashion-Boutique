@@ -34,6 +34,7 @@ const Checkout = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+console.log(isCOD);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -61,29 +62,53 @@ const Checkout = () => {
       Imageurl: item.Imageurl,
       title: item.title,
     }));
-    console.log("Products", products);
+    // console.log("Products", products);
+    const formData = new FormData();
 
-    const billingDetails = {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      address: data.streetAddress,
-      apartment: data.apartment,
-      postCode: data.postcode,
-      phone: data.phone,
-      email: data.email,
-      additionalInformation: data.additionalInfo,
-      products: products,
-      image: image,
-    };
-    console.log("BillingData", billingDetails);
+    if (image) {
+      formData.append("image", image);
+    }
+    formData.append("firstName", data.firstName);
+    formData.append("lastName", data.lastName);
+    formData.append("address", data.streetAddress);
+    formData.append("cashOnDelivery", isCOD);
+    formData.append(
+      "apartment",
+      data.apartment
+    );
+   formData.append("postCode", data.postCode);
+
+    formData.append("phone", data.phone);
+    formData.append("email", data.email);
+    formData.append("additionalInformation", data.additionalInformation);
+    formData.append("products", JSON.stringify(products));
+
+
+    // const billingDetails = {
+    //   firstName: data.firstName,
+    //   lastName: data.lastName,
+    //   address: data.streetAddress,
+    //   apartment: data.apartment,
+    //   postCode: data.postcode,
+    //   phone: data.phone,
+    //   email: data.email,
+    //   additionalInformation: data.additionalInfo,
+    //   products: products,
+    // };
+    // console.log("BillingData:")
+
+    for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+    }    
+    
 
     try {
       const response = await axios.post(
         `${apiKey}/create-billing-detail`,
-        billingDetails,
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -98,7 +123,7 @@ const Checkout = () => {
           navigate("/");
         }
       });
-      console.log("Order placed successfully:", response.data);
+      // console.log("Order placed successfully:", response.data);
       dispatch(clearCart());
     } catch (error) {
       Swal.fire({
@@ -239,7 +264,7 @@ const Checkout = () => {
                           <div className="billing-info mb-20">
                             <label>Postcode / ZIP</label>
                             <input
-                              type="text"
+                              type="number"
                               {...register("postcode", {
                                 required: "Postcode is required",
                               })}
@@ -255,7 +280,7 @@ const Checkout = () => {
                           <div className="billing-info mb-20">
                             <label>Phone</label>
                             <input
-                              type="text"
+                              type="number"
                               {...register("phone", {
                                 required: "Phone is required",
                               })}
