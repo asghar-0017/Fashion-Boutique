@@ -14,6 +14,14 @@ import Swal from "sweetalert2";
 // import { CreditCardContext } from "../../context/cardContext";
 import { Checkbox, FormControlLabel } from "@mui/material";
 
+const getDiscountedPrice = (price, discount) => {
+  if (price === undefined || price === null) return 0; // Ensure price has a valid value
+  if (discount && discount > 0) {
+    return price - (price * (discount / 100)); // Applying discount if exists
+  }
+  return price; // No discount applied, return actual price
+};
+
 const Checkout = () => {
   let cartTotalPrice = 0;
   let { pathname } = useLocation();
@@ -54,15 +62,21 @@ console.log(isCOD);
       setImageError("Image is required for online payments.");
       return;
     }
-    const products = cartItems.map((item) => ({
-      productId: item._id,
-      quantity: item.quantity,
-      price: item.price,
-      name: item.title,
-      Imageurl: item.Imageurl,
-      title: item.title,
-    }));
-    // console.log("Products", products);
+    const products = cartItems.map((item) => {
+      const price = item.newprice || item.price; // Use newprice if available, else fallback to price
+      const discountedPrice = getDiscountedPrice(price, item.discount); 
+      cartTotalPrice += discountedPrice * item.quantity; // Calculate total price
+      return {
+        productId: item._id,
+        quantity: item.quantity,
+        price: discountedPrice, // Use the calculated price
+        name: item.title,
+        Imageurl: item.Imageurl,
+        title: item.title,
+      };
+    });
+
+    console.log("Products.................................", products);
     const formData = new FormData();
 
     if (image) {
@@ -264,19 +278,19 @@ console.log(isCOD);
                           <div className="billing-info mb-20">
                             <label>Postcode / ZIP</label>
                             <input
-                              type="number"
-                              {...register("postcode", {
+                              type="Number"
+                              {...register("postCode", {
                                 required: "Postcode is required",
                               })}
                             />
-                            {errors.postcode && (
+                            {errors.postCode && (
                               <span style={{ color: "red" }}>
-                                {errors.postcode.message}
+                                {errors.postCode.message}
                               </span>
                             )}
                           </div>
                         </div>
-                        <div className="col-lg-6 col-md-6">
+                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>Phone</label>
                             <input
@@ -320,7 +334,7 @@ console.log(isCOD);
                           <label>Order notes</label>
                           <textarea
                             placeholder="Notes about your order, e.g. special notes for delivery."
-                            {...register("additionalInfo")}
+                            {...register("additionalInformation")}
                           />
                         </div>
                       </div>
