@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
 import Rating from "./sub-components/ProductRating";
-import "./productModal.css"; // External CSS file for styling
+import "./productModal.css"; 
 
 const ProductModal = ({
   show,
