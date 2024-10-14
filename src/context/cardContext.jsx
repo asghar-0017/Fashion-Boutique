@@ -1,28 +1,106 @@
 import React, { createContext, useState } from 'react';
 
-// Create a context
-export const CreditCardContext = createContext();
+export const MeasurementsContext = createContext();
 
-// Create a provider component
-export const CreditCardProvider = ({ children }) => {
-  const [cardDetails, setCardDetails] = useState({
-    number: '',
-    name: '',
-    expiry: '',
-    cvc: '',
+export const MeasurementsProvider = ({ children }) => {  
+  const [formData, setFormData] = useState({
+    customerName: "",
+    height: "",
+    weight: "",
+    image: "",
+    kameez: {
+      bustCircumference: "",
+      waistCircumference: "",
+      hipCircumference: "",
+      shoulderWidth: "",
+      kameezLength: "",
+      sleeveLength: "",
+      armholeCircumference: "",
+      bicepCircumference: "",
+      neckCircumference: "",
+      frontNeckDepth: "",
+      shoulderToWaistLength: "",
+      sleeveOpeningCircumference: "",
+    },
+    shalwar: {
+      waistCircumference: "",
+      hipCircumference: "",
+      thighCircumference: "",
+      inseamLength: "",
+      outseamLength: "",
+      ankleOpening: "",
+      rise: "",
+      crotchDepth: "",
+    },
+    fitPreferences: {
+      kameezFit: "",
+      sleeveStyle: "",
+      pantStyle: "",
+      necklineStyle: "",
+    },
   });
 
-  // Function to update card details
-  const updateCardDetails = (name, value) => {
-    setCardDetails((prevDetails) => ({
-      ...prevDetails,
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
     }));
   };
 
+  const handleKameezChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      kameez: {
+        ...prevData.kameez,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleShalwarChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      shalwar: {
+        ...prevData.shalwar,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleFitPreferencesChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      fitPreferences: {
+        ...prevData.fitPreferences,
+        [name]: value,
+      },
+    }));
+  };
+
+  // const handleImageUpload = (image) => {
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     image: image,
+  //   }));
+  // };
+
   return (
-    <CreditCardContext.Provider value={{ cardDetails, updateCardDetails }}>
+    <MeasurementsContext.Provider
+      value={{
+        formData,
+        handleChange,
+        handleKameezChange,
+        handleShalwarChange,
+        handleFitPreferencesChange,
+        setFormData,
+        // handleImageUpload
+      }}
+    >
       {children}
-    </CreditCardContext.Provider>
+    </MeasurementsContext.Provider>
   );
 };

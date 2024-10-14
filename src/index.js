@@ -13,25 +13,23 @@ import "./assets/scss/style.scss";
 import "./i18n";
 import API_CONFIG from "./config/Api/api";
 import axios from "axios";
-import { CreditCardProvider } from "./context/cardContext";
+import { MeasurementsProvider } from "./context/cardContext";
 
-// Define the fetchProducts function
 const fetchProducts = async () => {
   const { apiKey } = API_CONFIG;
   try {
     const response = await axios.get(`${apiKey}/get-product`);
     console.log(response.data.data);
-    return response.data.data; // Return only the data array
+    return response.data.data; 
   } catch (error) {
     console.error("There was an error fetching the products!", error);
-    return []; // Return an empty array in case of error
+    return []; 
   }
 };
 
-// Immediately Invoked Function Expression (IIFE) to fetch products and dispatch
 (async () => {
-  const products = await fetchProducts(); // Await the result of fetchProducts
-  store.dispatch(setProducts(products)); // Dispatch the actual data
+  const products = await fetchProducts(); 
+  store.dispatch(setProducts(products)); 
 })();
 
 const container = document.getElementById('root');
@@ -40,9 +38,9 @@ root.render(
   <Provider store={store}>
     <PersistProvider>
       <React.StrictMode>
-      <CreditCardProvider>
+      <MeasurementsProvider>
         <App />
-        </CreditCardProvider>
+        </MeasurementsProvider>
       </React.StrictMode>
     </PersistProvider>
   </Provider>

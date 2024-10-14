@@ -10,19 +10,24 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import API_CONFIG from "../../config/Api/api";
 import axios from "axios";
 import Swal from "sweetalert2";
-// import CreditCardForm from "../../components/credit-card/credit-card";
-// import { CreditCardContext } from "../../context/cardContext";
 import { Checkbox, FormControlLabel } from "@mui/material";
+import { MeasurementsContext } from "../../context/cardContext";
 
 const getDiscountedPrice = (price, discount) => {
-  if (price === undefined || price === null) return 0; // Ensure price has a valid value
+  if (price === undefined || price === null) return 0;
   if (discount && discount > 0) {
-    return price - (price * (discount / 100)); // Applying discount if exists
+    return price - (price * (discount / 100)); 
   }
-  return price; // No discount applied, return actual price
+  return price; 
 };
 
+
 const Checkout = () => {
+  const { formData, setFormData } = useContext(MeasurementsContext);
+
+  let measurementsData = { ...formData }; 
+
+  console.log(measurementsData);
   let cartTotalPrice = 0;
   let { pathname } = useLocation();
   let navigate = useNavigate();
@@ -35,14 +40,12 @@ const Checkout = () => {
   const [imageError, setImageError] = useState("");
   const [image, setImage] = useState(null);
 
-  // const { cardDetails } = useContext(CreditCardContext);
   const [isCOD, setIsCOD] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-console.log(isCOD);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -63,13 +66,13 @@ console.log(isCOD);
       return;
     }
     const products = cartItems.map((item) => {
-      const price = item.newprice || item.price; // Use newprice if available, else fallback to price
+      const price = item.newprice || item.price; 
       const discountedPrice = getDiscountedPrice(price, item.discount); 
-      cartTotalPrice += discountedPrice * item.quantity; // Calculate total price
+      cartTotalPrice += discountedPrice * item.quantity; 
       return {
         productId: item._id,
         quantity: item.quantity,
-        price: discountedPrice, // Use the calculated price
+        price: discountedPrice,
         name: item.title,
         Imageurl: item.Imageurl,
         title: item.title,
@@ -94,6 +97,11 @@ console.log(isCOD);
 
     formData.append("phone", data.phone);
     formData.append("email", data.email);
+
+    if(measurementsData){
+      formData.append("isStitching", true);
+      formData.append("stretchData", JSON.stringify(measurementsData));
+    }
     formData.append("additionalInformation", data.additionalInformation);
     formData.append("products", JSON.stringify(products));
 
@@ -115,7 +123,6 @@ console.log(isCOD);
         console.log(`${key}:`, value);
     }    
     
-
     try {
       const response = await axios.post(
         `${apiKey}/create-billing-detail`,
@@ -134,6 +141,7 @@ console.log(isCOD);
         confirmButtonText: "OK",
       }).then((result) => {
         if (result.isConfirmed) {
+          setFormData({}); 
           navigate("/");
         }
       });
@@ -462,6 +470,11 @@ console.log(isCOD);
                           </div>
                         </div>
                         <div className="payment-method"></div>
+                      </div>
+                      <div className="place-order mt-25">
+                        <button onClick={()=>navigate('/measurements')} className="btn-hover">
+                          For Measurements
+                        </button>
                       </div>
                       <div className="place-order mt-25">
                         <button type="submit" className="btn-hover">

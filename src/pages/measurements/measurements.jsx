@@ -1,98 +1,51 @@
-import React, { useState } from "react";
+// src/components/Measurements.js
+import React, { useContext, useState } from 'react';
 import {
   Grid,
   TextField,
   MenuItem,
   Button,
   Container,
-  Typography, // Import Typography for professional headings
-} from "@mui/material";
-import LayoutOne from "../../layouts/LayoutOne";
-import SEO from "../../components/seo";
+  Typography,
+  Box,
+  FormControlLabel,
+  Checkbox,
+} from '@mui/material';
+import { MeasurementsContext } from '../../context/cardContext';
+import LayoutOne from '../../layouts/LayoutOne';
+import SEO from '../../components/seo';
+import { useNavigate } from 'react-router-dom';
 
 const Measurements = () => {
-  const [formData, setFormData] = useState({
-    customerName: "",
-    height: "",
-    weight: "",
-    image: "",
-    kameez: {
-      bustCircumference: "",
-      waistCircumference: "",
-      hipCircumference: "",
-      shoulderWidth: "",
-      kameezLength: "",
-      sleeveLength: "",
-      armholeCircumference: "",
-      bicepCircumference: "",
-      neckCircumference: "",
-      frontNeckDepth: "",
-      shoulderToWaistLength: "",
-      sleeveOpeningCircumference: "",
-    },
-    shalwar: {
-      waistCircumference: "",
-      hipCircumference: "",
-      thighCircumference: "",
-      inseamLength: "",
-      outseamLength: "",
-      ankleOpening: "",
-      rise: "",
-      crotchDepth: "",
-    },
-    fitPreferences: {
-      kameezFit: "",
-      sleeveStyle: "",
-      pantStyle: "",
-      necklineStyle: "",
-    },
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleKameezChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      kameez: {
-        ...prevData.kameez,
-        [name]: value,
-      },
-    }));
-  };
-
-  const handleShalwarChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      shalwar: {
-        ...prevData.shalwar,
-        [name]: value,
-      },
-    }));
-  };
-
-  const handleFitPreferencesChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      fitPreferences: {
-        ...prevData.fitPreferences,
-        [name]: value,
-      },
-    }));
-  };
+  let navigate = useNavigate()
+  const {
+    formData,
+    handleChange,
+    handleKameezChange,
+    handleShalwarChange,
+    handleFitPreferencesChange,
+    handleImageUpload
+  } = useContext(MeasurementsContext);
+  const [showUploadButton, setShowUploadButton] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    navigate('/checkout')
   };
+
+  // const handleImageUploadChange = (event) => {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //       handleImageUpload(file);
+  //   }
+  // };
+
+  // const handleCheckboxChange = (event) => {
+  //   setShowUploadButton(event.target.checked);
+  //   if (!event.target.checked) {
+  //     handleImageUpload(null); // Reset image in context when unchecked
+  //   }
+  // };
 
   return (
     <>
@@ -102,23 +55,23 @@ const Measurements = () => {
       />
       <LayoutOne
         headerContainerClass="container-fluid"
-        headerPaddingClass="header-padding-1">
+        headerPaddingClass="header-padding-1"
+      >
         <Container
           maxWidth="md"
           style={{
-            marginTop: "40px",
-            marginBottom: "40px",
-            padding: "20px",
-            backgroundColor: "#f9f9f9", // Light background for contrast
-            borderRadius: "8px", // Rounded corners
-          }}>
+            marginTop: '40px',
+            marginBottom: '40px',
+            padding: '20px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '8px',
+          }}
+        >
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               {/* Customer Info */}
               <Grid item xs={12}>
-                <Typography
-                  variant="h4"
-                  gutterBottom>
+                <Typography variant="h4" gutterBottom>
                   Customer Information
                 </Typography>
               </Grid>
@@ -154,52 +107,34 @@ const Measurements = () => {
                   onChange={handleChange}
                 />
               </Grid>
-              {/* <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Image URL"
-                  name="image"
-                  placeholder="Enter image URL"
-                  value={formData.image}
-                  onChange={handleChange}
-                />
-              </Grid> */}
 
               {/* Kameez Measurements */}
               <Grid item xs={12}>
-                <Typography
-                  variant="h4"
-                  gutterBottom>
+                <Typography variant="h4" gutterBottom>
                   Kameez Measurements
                 </Typography>
               </Grid>
               {[
-                "bustCircumference",
-                "waistCircumference",
-                "hipCircumference",
-                "shoulderWidth",
-                "kameezLength",
-                "sleeveLength",
-                "armholeCircumference",
-                "bicepCircumference",
-                "neckCircumference",
-                "frontNeckDepth",
-                "shoulderToWaistLength",
-                "sleeveOpeningCircumference",
+                'bustCircumference',
+                'waistCircumference',
+                'hipCircumference',
+                'shoulderWidth',
+                'kameezLength',
+                'sleeveLength',
+                'armholeCircumference',
+                'bicepCircumference',
+                'neckCircumference',
+                'frontNeckDepth',
+                'shoulderToWaistLength',
+                'sleeveOpeningCircumference',
               ].map((field) => (
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  key={field}>
+                <Grid item xs={12} sm={6} key={field}>
                   <TextField
                     fullWidth
-                    label={field
-                      .replace(/([A-Z])/g, " $1")
-                      .trim()}
+                    label={field.replace(/([A-Z])/g, ' $1').trim()}
                     type="number"
                     placeholder={`Enter ${field
-                      .replace(/([A-Z])/g, " $1")
+                      .replace(/([A-Z])/g, ' $1')
                       .trim()
                       .toLowerCase()}`}
                     name={field}
@@ -211,41 +146,31 @@ const Measurements = () => {
 
               {/* Shalwar Measurements */}
               <Grid item xs={12}>
-                <Typography
-                  variant="h4"
-                  gutterBottom>
+                <Typography variant="h4" gutterBottom>
                   Shalwar Measurements
                 </Typography>
               </Grid>
               {[
-                "waistCircumference",
-                "hipCircumference",
-                "thighCircumference",
-                "inseamLength",
-                "outseamLength",
-                "ankleOpening",
-                "rise",
-                "crotchDepth",
+                'waistCircumference',
+                'hipCircumference',
+                'thighCircumference',
+                'inseamLength',
+                'outseamLength',
+                'ankleOpening',
+                'rise',
+                'crotchDepth',
               ].map((field) => (
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  key={field}>
+                <Grid item xs={12} sm={6} key={field}>
                   <TextField
                     fullWidth
-                    label={field
-                      .replace(/([A-Z])/g, " $1")
-                      .trim()}
+                    label={field.replace(/([A-Z])/g, ' $1').trim()}
                     type="number"
                     placeholder={`Enter ${field
-                      .replace(/([A-Z])/g, " $1")
+                      .replace(/([A-Z])/g, ' $1')
                       .trim()
                       .toLowerCase()}`}
                     name={field}
-                    value={
-                      formData.shalwar[field]
-                    }
+                    value={formData.shalwar[field]}
                     onChange={handleShalwarChange}
                   />
                 </Grid>
@@ -253,13 +178,12 @@ const Measurements = () => {
 
               {/* Fit Preferences */}
               <Grid item xs={12}>
-                <Typography
-                  variant="h4"
-                  gutterBottom>
+                <Typography variant="h4" gutterBottom>
                   Fit Preferences
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+<Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   select
@@ -366,19 +290,62 @@ const Measurements = () => {
                 </TextField>
               </Grid>
 
+              {/* <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showUploadButton}
+                      onChange={handleCheckboxChange}
+                      color="primary"
+                    />
+                  }
+                  label="Upload an image"
+                />
+                {showUploadButton && (
+                  <Box mt={2}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUploadChange} // Use new handler
+                      style={{ display: 'none' }}
+                      id="image-upload"
+                    />
+                    <label htmlFor="image-upload">
+                      <Button variant="contained" component="span">
+                        Upload Image
+                      </Button>
+                    </label>
+                    {formData.image && ( // Use image from formData
+                      <Box mt={2}>
+                        <img
+                          src={formData.image}
+                          alt="Uploaded"
+                          style={{ maxWidth: '100%', height: 'auto' }}
+                        />
+                      </Box>
+                    )}
+                  </Box>
+                )}
+              </Grid> */}
+
+              {/* Other fields omitted for brevity */}
               <Grid item xs={12}>
                 <Button
                   type="submit"
                   variant="contained"
                   color="primary"
                   style={{
-                    padding: "10px 20px",
-                    fontSize: "16px",
-                    marginTop: "20px",
-                  }}>
+                    padding: '10px 20px',
+                    fontSize: '16px',
+                    marginTop: '20px',
+                  }}
+                >
                   Submit
                 </Button>
               </Grid>
+
+
+
             </Grid>
           </form>
         </Container>
