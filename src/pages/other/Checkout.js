@@ -16,16 +16,15 @@ import { MeasurementsContext } from "../../context/cardContext";
 const getDiscountedPrice = (price, discount) => {
   if (price === undefined || price === null) return 0;
   if (discount && discount > 0) {
-    return price - (price * (discount / 100)); 
+    return price - price * (discount / 100);
   }
-  return price; 
+  return price;
 };
-
 
 const Checkout = () => {
   const { formData, setFormData } = useContext(MeasurementsContext);
 
-  let measurementsData = { ...formData }; 
+  let measurementsData = { ...formData };
 
   console.log(measurementsData);
   let cartTotalPrice = 0;
@@ -66,9 +65,9 @@ const Checkout = () => {
       return;
     }
     const products = cartItems.map((item) => {
-      const price = item.newprice || item.price; 
-      const discountedPrice = getDiscountedPrice(price, item.discount); 
-      cartTotalPrice += discountedPrice * item.quantity; 
+      const price = item.newprice || item.price;
+      const discountedPrice = getDiscountedPrice(price, item.discount);
+      cartTotalPrice += discountedPrice * item.quantity;
       return {
         productId: item._id,
         quantity: item.quantity,
@@ -83,28 +82,32 @@ const Checkout = () => {
     const formData = new FormData();
 
     if (image) {
-      formData.append("image", image);
+      formData.append("cashOnDeliveryImage", image);
     }
     formData.append("firstName", data.firstName);
     formData.append("lastName", data.lastName);
     formData.append("address", data.streetAddress);
     formData.append("cashOnDelivery", isCOD);
-    formData.append(
-      "apartment",
-      data.apartment
-    );
-   formData.append("postCode", data.postCode);
+    formData.append("apartment", data.apartment);
+    formData.append("postCode", data.postCode);
 
     formData.append("phone", data.phone);
     formData.append("email", data.email);
 
-    if(measurementsData){
+    if(
+      measurementsData.customerName || 
+      measurementsData.height || 
+      measurementsData.weight || 
+      measurementsData.stitchImage ||
+      (measurementsData.kameez && Object.values(measurementsData.kameez).some(value => value)) || // Check Kameez measurements
+      (measurementsData.shalwar && Object.values(measurementsData.shalwar).some(value => value)) || // Check Shalwar measurements
+      (measurementsData.fitPreferences && Object.values(measurementsData.fitPreferences).some(value => value)) // Check Fit Preferences
+    ) {
       formData.append("isStitching", true);
       formData.append("stretchData", JSON.stringify(measurementsData));
     }
     formData.append("additionalInformation", data.additionalInformation);
     formData.append("products", JSON.stringify(products));
-
 
     // const billingDetails = {
     //   firstName: data.firstName,
@@ -120,9 +123,9 @@ const Checkout = () => {
     // console.log("BillingData:")
 
     for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-    }    
-    
+      console.log(`${key}:`, value);
+    }
+
     try {
       const response = await axios.post(
         `${apiKey}/create-billing-detail`,
@@ -141,7 +144,7 @@ const Checkout = () => {
         confirmButtonText: "OK",
       }).then((result) => {
         if (result.isConfirmed) {
-          setFormData({}); 
+          setFormData({});
           navigate("/");
         }
       });
@@ -298,7 +301,7 @@ const Checkout = () => {
                             )}
                           </div>
                         </div>
-                         <div className="col-lg-6 col-md-6">
+                        <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>Phone</label>
                             <input
@@ -372,10 +375,8 @@ const Checkout = () => {
                               className="form-control"
                             />
                             {imageError && (
-                                <span style={{ color: "red" }}>
-                                  {imageError}
-                                </span>
-                              )}
+                              <span style={{ color: "red" }}>{imageError}</span>
+                            )}
                           </div>
 
                           {uploadedImage && (
@@ -394,7 +395,9 @@ const Checkout = () => {
                           )}
 
                           <div className="account-number mt-2">
-                            <h3 style={{fontWeight: "bold"}}>Account Number: {accountNumber}</h3>
+                            <h3 style={{ fontWeight: "bold" }}>
+                              Account Number: {accountNumber}
+                            </h3>
                           </div>
                         </div>
                       )}
@@ -472,7 +475,10 @@ const Checkout = () => {
                         <div className="payment-method"></div>
                       </div>
                       <div className="place-order mt-25">
-                        <button onClick={()=>navigate('/measurements')} className="btn-hover">
+                        <button
+                          onClick={() => navigate("/measurements")}
+                          className="btn-hover"
+                        >
                           For Measurements
                         </button>
                       </div>

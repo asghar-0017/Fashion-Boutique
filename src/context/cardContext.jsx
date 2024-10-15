@@ -7,7 +7,7 @@ export const MeasurementsProvider = ({ children }) => {
     customerName: "",
     height: "",
     weight: "",
-    image: "",
+    stitchImage: "",
     kameez: {
       bustCircumference: "",
       waistCircumference: "",
@@ -81,12 +81,14 @@ export const MeasurementsProvider = ({ children }) => {
     }));
   };
 
-  // const handleImageUpload = (image) => {
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     image: image,
-  //   }));
-  // };
+  const handleImageUpload = (image) => {
+    console.log(image);
+    
+    setFormData((prevData) => ({
+      ...prevData,
+      stitchImage: image,
+    }));
+  };
 
   return (
     <MeasurementsContext.Provider
@@ -97,7 +99,7 @@ export const MeasurementsProvider = ({ children }) => {
         handleShalwarChange,
         handleFitPreferencesChange,
         setFormData,
-        // handleImageUpload
+        handleImageUpload
       }}
     >
       {children}

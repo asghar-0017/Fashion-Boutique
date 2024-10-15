@@ -33,19 +33,21 @@ const Measurements = () => {
     navigate('/checkout')
   };
 
-  // const handleImageUploadChange = (event) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //       handleImageUpload(file);
-  //   }
-  // };
+  const handleImageUploadChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log(file);
+      
+        handleImageUpload(file);
+    }
+  };
 
-  // const handleCheckboxChange = (event) => {
-  //   setShowUploadButton(event.target.checked);
-  //   if (!event.target.checked) {
-  //     handleImageUpload(null); // Reset image in context when unchecked
-  //   }
-  // };
+  const handleCheckboxChange = (event) => {
+    setShowUploadButton(event.target.checked);
+    if (!event.target.checked) {
+      handleImageUpload(null); 
+    }
+  };
 
   return (
     <>
@@ -290,7 +292,7 @@ const Measurements = () => {
                 </TextField>
               </Grid>
 
-              {/* <Grid item xs={12}>
+              <Grid item xs={12}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -306,7 +308,7 @@ const Measurements = () => {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleImageUploadChange} // Use new handler
+                      onChange={handleImageUploadChange}
                       style={{ display: 'none' }}
                       id="image-upload"
                     />
@@ -315,10 +317,10 @@ const Measurements = () => {
                         Upload Image
                       </Button>
                     </label>
-                    {formData.image && ( // Use image from formData
+                    {formData.stitchImage && ( // Use image from formData
                       <Box mt={2}>
                         <img
-                          src={formData.image}
+                          src={formData.stitchImage}
                           alt="Uploaded"
                           style={{ maxWidth: '100%', height: 'auto' }}
                         />
@@ -326,7 +328,7 @@ const Measurements = () => {
                     )}
                   </Box>
                 )}
-              </Grid> */}
+              </Grid>
 
               {/* Other fields omitted for brevity */}
               <Grid item xs={12}>
