@@ -98,17 +98,26 @@ const Checkout = () => {
       measurementsData.customerName || 
       measurementsData.height || 
       measurementsData.weight || 
-      measurementsData.stitchImage ||
+      (measurementsData.stitchImage && measurementsData.stitchImage instanceof File) ||
       (measurementsData.kameez && Object.values(measurementsData.kameez).some(value => value)) || // Check Kameez measurements
       (measurementsData.shalwar && Object.values(measurementsData.shalwar).some(value => value)) || // Check Shalwar measurements
       (measurementsData.fitPreferences && Object.values(measurementsData.fitPreferences).some(value => value)) // Check Fit Preferences
     ) {
       formData.append("isStitching", true);
-      formData.append("stretchData", JSON.stringify(measurementsData));
+
+    const { stitchImage, ...otherMeasurementsData } = measurementsData;
+    formData.append("stretchData", JSON.stringify(otherMeasurementsData));
+    if (stitchImage && stitchImage instanceof File) {
+      console.log("image");
+      formData.append("stitchImage", stitchImage);
+    }
+
+    console.log(image, stitchImage);
+    
     }
     formData.append("additionalInformation", data.additionalInformation);
     formData.append("products", JSON.stringify(products));
-
+    
     // const billingDetails = {
     //   firstName: data.firstName,
     //   lastName: data.lastName,
