@@ -77,7 +77,6 @@ const Checkout = () => {
         title: item.title,
         stitchedPrice:item.price,
         isStitched:item.isStitched
-
       };
     });
 
