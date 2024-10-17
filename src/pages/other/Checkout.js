@@ -75,6 +75,9 @@ const Checkout = () => {
         name: item.title,
         Imageurl: item.Imageurl,
         title: item.title,
+        stitchedPrice:item.price,
+        isStitched:item.isStitched
+
       };
     });
 
@@ -104,7 +107,6 @@ const Checkout = () => {
       (measurementsData.fitPreferences && Object.values(measurementsData.fitPreferences).some(value => value)) // Check Fit Preferences
     ) {
       formData.append("isStitching", true);
-
     const { stitchImage, ...otherMeasurementsData } = measurementsData;
     formData.append("stretchData", JSON.stringify(otherMeasurementsData));
     if (stitchImage && stitchImage instanceof File) {
@@ -112,7 +114,7 @@ const Checkout = () => {
       formData.append("stitchImage", stitchImage);
     }
 
-    console.log(image, stitchImage);
+    // console.log(image, stitchImage);
     
     }
     formData.append("additionalInformation", data.additionalInformation);
