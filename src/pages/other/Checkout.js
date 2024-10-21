@@ -24,6 +24,23 @@ const getDiscountedPrice = (price, discount) => {
 const Checkout = () => {
   const { formData, setFormData } = useContext(MeasurementsContext);
 
+
+  const isObjectEmpty = (obj) => {
+    return Object.values(obj).every((value) => {
+      if (typeof value === "string") {
+        return value === ""; 
+      } else if (typeof value === "object" && value !== null) {
+        return isObjectEmpty(value); 
+      }
+      return false;
+    });
+  };
+
+  const isStitched = isObjectEmpty(formData);
+  
+  console.log(isStitched);
+  
+
   let measurementsData = { ...formData };
 
   console.log(measurementsData);
@@ -472,6 +489,16 @@ const Checkout = () => {
                               <li>Free shipping</li>
                             </ul>
                           </div>
+                          
+                          {/* <div className="your-order-total">
+                            <ul>
+                              <li className="order-total">stitched Price</li>
+                              <li>
+                                {isStitched}
+                              </li>
+                            </ul>
+                          </div> */}
+
                           <div className="your-order-total">
                             <ul>
                               <li className="order-total">Total</li>

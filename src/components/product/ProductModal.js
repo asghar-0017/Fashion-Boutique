@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
 import Rating from "./sub-components/ProductRating";
-import "./productModal.css"; 
+import "./productModal.css";
 
 const ProductModal = ({
   show,
@@ -122,13 +122,17 @@ const ProductModal = ({
         </div>
       </Modal.Body>
       <Modal.Footer className="modal-footer-custom">
-      <Button
-  className={`btn-add-to-cart ${product.stockStatus === "Out of Stock" ? "out-of-stock" : ""}`}
-  onClick={handleAddToCart}
-  disabled={product.stockStatus === "Out of Stock"} // Disable the button if out of stock
->
-  {product.stockStatus === "Out of Stock" ? "Out of Stock" : "Add to Cart"}
-</Button>
+        <Button
+          className={`btn-add-to-cart ${
+            product.stockStatus === "Out of Stock" ? "out-of-stock" : ""
+          }`}
+          onClick={handleAddToCart}
+          disabled={product.stockStatus === "Out of Stock"} // Disable the button if out of stock
+        >
+          {product.stockStatus === "Out of Stock"
+            ? "Out of Stock"
+            : "Add to Cart"}
+        </Button>
         <Button className="btn-add-to-wishlist" onClick={handleAddToWishlist}>
           Add to Wishlist
         </Button>

@@ -25,7 +25,8 @@ const ProductDescriptionInfo = ({
   const initialStock =
     product?.variations?.[0]?.sizes?.[0]?.stock || product?.stock || 0;
 
-  const [selectedProductColor, setSelectedProductColor] = useState(initialColor);
+  const [selectedProductColor, setSelectedProductColor] =
+    useState(initialColor);
   const [selectedProductSize, setSelectedProductSize] = useState(initialSize);
   const [productStock, setProductStock] = useState(initialStock);
   const [quantityCount, setQuantityCount] = useState(1);
@@ -48,7 +49,9 @@ const ProductDescriptionInfo = ({
     dispatch(
       addToCart({
         ...product,
-        discountprice: discountedPrice ? finalDiscountedPrice : finalProductPrice,
+        discountprice: discountedPrice
+          ? finalDiscountedPrice
+          : finalProductPrice,
         quantity: quantityCount,
         selectedColor: selectedProductColor,
         selectedSize: selectedProductSize,
@@ -66,26 +69,25 @@ const ProductDescriptionInfo = ({
     dispatch(
       addToWishlist({
         ...product,
-        discountprice: discountedPrice ? finalDiscountedPrice : finalProductPrice,
+        discountprice: discountedPrice
+          ? finalDiscountedPrice
+          : finalProductPrice,
         selectedColor: selectedProductColor,
         selectedSize: selectedProductSize,
       })
     );
-    console.log("Add To WishList",addToWishlist)
+    console.log("Add To WishList", addToWishlist);
     cogoToast.success("Added to Wishlist!");
   };
-  
 
   return (
     <div className="product-details-content ml-70">
       <h2>{product.title}</h2>
       <div className="product-details-price">
-        <span>
-          {currency.currencySymbol + calculatedTotalPrice.toFixed(2)}
-        </span>
+        <span>{currency.currencySymbol + calculatedTotalPrice.toFixed(2)}</span>
         {discountedPrice !== null && (
           <span className="old">
-            {currency.currencySymbol + (product.price).toFixed(2)}
+            {currency.currencySymbol + product.price.toFixed(2)}
           </span>
         )}
       </div>
@@ -182,13 +184,23 @@ const ProductDescriptionInfo = ({
             +
           </button>
         </div>
-
-        <div className="pro-details-cart btn-hover">
-          <button onClick={handleAddToCart}>Add to Cart</button>
-        </div>
-        <div className="pro-details-cart btn-hover">
+        {product.stockStatus && product.stockStatus == "In Stock" ? (
+          <div className="pro-details-cart btn-hover">
+            <button onClick={handleAddToCart}>Add to Cart</button>
+          </div>
+        ) : (
+          <div className="pro-details-cart btn-hover">
+            <button disabled={product.stockStatus === "Out of Stock"}>
+              Out of Stock
+            </button>
+          </div>
+        )}
+        {product.stockStatus && product.stockStatus == "In Stock" && (
+          <div className="pro-details-cart btn-hover">
           <button onClick={handleBuyNow}>Buy Now</button>
         </div>
+       )}
+       
 
         <div className="pro-details-wishlist">
           <button

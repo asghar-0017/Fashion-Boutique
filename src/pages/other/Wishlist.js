@@ -6,18 +6,20 @@ import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { addToCart } from "../../store/slices/cart-slice";
-import { deleteFromWishlist, deleteAllFromWishlist } from "../../store/slices/wishlist-slice";
+import {
+  deleteFromWishlist,
+  deleteAllFromWishlist,
+} from "../../store/slices/wishlist-slice";
 
 const Wishlist = () => {
   const dispatch = useDispatch();
-  const { pathname } = useLocation(); 
+  const { pathname } = useLocation();
 
   const currency = useSelector((state) => state.currency);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
 
   console.log(wishlistItems);
-  
 
   return (
     <Fragment>
@@ -66,16 +68,16 @@ const Wishlist = () => {
                               (item) => item.id === wishlistItem.id
                             );
 
+                            const finalProductPrice =
+                              wishlistItem.price * currency.currencyRate;
+                            const finalDiscountedPrice =
+                              wishlistItem.discountprice
+                                ? wishlistItem.discountprice *
+                                  currency.currencyRate
+                                : finalProductPrice;
 
-                            const finalProductPrice = wishlistItem.price * currency.currencyRate;
-                            const finalDiscountedPrice = wishlistItem.discountprice
-                              ? wishlistItem.discountprice * currency.currencyRate
-                              : finalProductPrice;
+                            console.log("WishList Items", wishlistItem);
 
-                            
-
-                            console.log("WishList Items",wishlistItem)
-                            
                             return (
                               <tr key={wishlistItem.id}>
                                 <td className="product-thumbnail">
@@ -106,17 +108,22 @@ const Wishlist = () => {
                                   {finalDiscountedPrice !== null ? (
                                     <Fragment>
                                       <span className="amount">
-                                        {currency.currencySymbol + finalDiscountedPrice}
-                                      </span>&nbsp;
-                                      {finalProductPrice != finalDiscountedPrice && (
-                                      <span className="amount old">
-                                        {currency.currencySymbol + finalProductPrice}
+                                        {currency.currencySymbol +
+                                          finalDiscountedPrice}
                                       </span>
+                                      &nbsp;
+                                      {finalProductPrice !=
+                                        finalDiscountedPrice && (
+                                        <span className="amount old">
+                                          {currency.currencySymbol +
+                                            finalProductPrice}
+                                        </span>
                                       )}
                                     </Fragment>
                                   ) : (
                                     <span className="amount">
-                                      {currency.currencySymbol + finalProductPrice}
+                                      {currency.currencySymbol +
+                                        finalProductPrice}
                                     </span>
                                   )}
                                 </td>
@@ -131,22 +138,26 @@ const Wishlist = () => {
                                       Buy now
                                     </a>
                                   ) : wishlistItem.variation?.length > 0 ? (
-                                    <Link to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}>
+                                    <Link
+                                      to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
+                                    >
                                       Select option
                                     </Link>
                                   ) : (
                                     <button
-                                    
-                                    onClick={() =>
-                                      dispatch(
-                                        addToCart({
-                                          ...wishlistItem,
-                                          price:finalProductPrice,
-                                          discountedPrice: finalDiscountedPrice 
-                                        })
-                                      )
-                                    }                                    
-                                      className={cartItem?.quantity > 0 ? "active" : ""}
+                                      onClick={() =>
+                                        dispatch(
+                                          addToCart({
+                                            ...wishlistItem,
+                                            price: finalProductPrice,
+                                            discountedPrice:
+                                              finalDiscountedPrice,
+                                          })
+                                        )
+                                      }
+                                      className={
+                                        cartItem?.quantity > 0 ? "active" : ""
+                                      }
                                       title={
                                         cartItem?.quantity > 0
                                           ? "Added to cart"
@@ -154,24 +165,30 @@ const Wishlist = () => {
                                           ? "Out of stock"
                                           : "Add to cart"
                                       }
-                                      disabled={wishlistItem.stock <= 0}
+                                      disabled={
+                                        wishlistItem.stock <= 0 ||
+                                        wishlistItem.stockStatus ===
+                                          "Out of Stock"
+                                      }
                                     >
-                                        {console.log(finalDiscountedPrice, finalProductPrice)
-                                    }
+                                      {/* {console.log(cartItem)
+                                      } */}
                                       {wishlistItem.stock <= 0
                                         ? "Out of Stock"
                                         : cartItem?.quantity > 0
                                         ? "Added"
                                         : "Add to Cart"}
                                     </button>
-                                    
                                   )}
-                                  
                                 </td>
 
                                 <td className="product-remove">
                                   <button
-                                    onClick={() => dispatch(deleteFromWishlist(wishlistItem.id))}
+                                    onClick={() =>
+                                      dispatch(
+                                        deleteFromWishlist(wishlistItem.id)
+                                      )
+                                    }
                                   >
                                     <i className="fa fa-times"></i>
                                   </button>
@@ -225,9 +242,7 @@ const Wishlist = () => {
                     </div>
                     <div className="item-empty-area__text">
                       No items found in wishlist <br />
-                      <Link to={`${process.env.PUBLIC_URL}/`}>
-                        Add Items
-                      </Link>
+                      <Link to={`${process.env.PUBLIC_URL}/`}>Add Items</Link>
                     </div>
                   </div>
                 </div>
