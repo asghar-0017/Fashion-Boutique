@@ -2,7 +2,7 @@ import { Fragment, useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { clearCart } from "../../store/slices/cart-slice";
+import { clearCart, setCartItems } from "../../store/slices/cart-slice"; // Ensure you import setCartItems
 import { getDiscountPrice } from "../../helpers/product";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
@@ -23,27 +23,15 @@ const getDiscountedPrice = (price, discount) => {
 
 const Checkout = () => {
   const { formData, setFormData } = useContext(MeasurementsContext);
-
-
-  const isObjectEmpty = (obj) => {
-    return Object.values(obj).every((value) => {
-      if (typeof value === "string") {
-        return value === ""; 
-      } else if (typeof value === "object" && value !== null) {
-        return isObjectEmpty(value); 
-      }
-      return false;
-    });
-  };
-
-  const isStitched = isObjectEmpty(formData);
-  
-  console.log(isStitched);
-  
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [accountNumber, setAccountNumber] = useState("1234567890");
+  const [imageError, setImageError] = useState("");
+  const [image, setImage] = useState(null);
+  const [isCOD, setIsCOD] = useState(false);
+  const [measurementError, setMeasurementError] = useState(null); // For measurement errors
 
   let measurementsData = { ...formData };
-
-  console.log(measurementsData);
+  
   let cartTotalPrice = 0;
   let { pathname } = useLocation();
   let navigate = useNavigate();
@@ -51,12 +39,7 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [accountNumber, setAccountNumber] = useState("1234567890");
-  const [imageError, setImageError] = useState("");
-  const [image, setImage] = useState(null);
 
-  const [isCOD, setIsCOD] = useState(false);
   const {
     register,
     handleSubmit,
@@ -81,6 +64,15 @@ const Checkout = () => {
       setImageError("Image is required for online payments.");
       return;
     }
+
+    // Validate hipCircumference for shalwar
+    if (!measurementsData.shalwar || !measurementsData.shalwar.hipCircumference) {
+      setMeasurementError("Hip Circumference for Shalwar is required.");
+      return;
+    }
+
+    setMeasurementError(null); // Clear previous errors if validation passes
+
     const products = cartItems.map((item) => {
       const price = item.newprice || item.price;
       const discountedPrice = getDiscountedPrice(price, item.discount);
@@ -92,66 +84,50 @@ const Checkout = () => {
         name: item.title,
         Imageurl: item.Imageurl,
         title: item.title,
-        stitchedPrice:item.price,
-        isStitched:item.isStitched
+        stitchedPrice: item.stitchedPrice,
+        isStitched: item.isStitched,
+        stretchData: measurementsData,
       };
     });
 
-    console.log("Products.................................", products);
     const formData = new FormData();
 
     if (image) {
       formData.append("cashOnDeliveryImage", image);
     }
+
     formData.append("firstName", data.firstName);
     formData.append("lastName", data.lastName);
     formData.append("address", data.streetAddress);
     formData.append("cashOnDelivery", isCOD);
     formData.append("apartment", data.apartment);
     formData.append("postCode", data.postCode);
-
     formData.append("phone", data.phone);
     formData.append("email", data.email);
 
-    if(
-      measurementsData.customerName || 
-      measurementsData.height || 
-      measurementsData.weight || 
-      (measurementsData.stitchImage && measurementsData.stitchImage instanceof File) ||
-      (measurementsData.kameez && Object.values(measurementsData.kameez).some(value => value)) || // Check Kameez measurements
-      (measurementsData.shalwar && Object.values(measurementsData.shalwar).some(value => value)) || // Check Shalwar measurements
-      (measurementsData.fitPreferences && Object.values(measurementsData.fitPreferences).some(value => value)) // Check Fit Preferences
-    ) {
-      formData.append("isStitching", true);
-    const { stitchImage, ...otherMeasurementsData } = measurementsData;
-    formData.append("stretchData", JSON.stringify(otherMeasurementsData));
-    if (stitchImage && stitchImage instanceof File) {
-      console.log("image");
-      formData.append("stitchImage", stitchImage);
-    }
+     // Add stitching data if applicable
+  if (measurementsData.customerName || measurementsData.height || measurementsData.weight) {
+    formData.append("isStitching", true);
 
-    // console.log(image, stitchImage);
-    
-    }
-    formData.append("additionalInformation", data.additionalInformation);
-    formData.append("products", JSON.stringify(products));
-    
-    // const billingDetails = {
-    //   firstName: data.firstName,
-    //   lastName: data.lastName,
-    //   address: data.streetAddress,
-    //   apartment: data.apartment,
-    //   postCode: data.postcode,
-    //   phone: data.phone,
-    //   email: data.email,
-    //   additionalInformation: data.additionalInfo,
-    //   products: products,
-    // };
-    // console.log("BillingData:")
+    // Append all relevant measurements in a structured way
+    const stitchMeasurements = {
+      customerName: measurementsData.customerName || "",
+      height: measurementsData.height || 0,
+      weight: measurementsData.weight || 0,
+      kameez: measurementsData.kameez || {},
+      shalwar: measurementsData.shalwar || {},
+      fitPreferences: measurementsData.fitPreferences || {},
+      stitchImage: measurementsData.stitchImage instanceof File ? measurementsData.stitchImage : null,
+    };
 
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
+    formData.append("stretchData", JSON.stringify(stitchMeasurements));
+    if (stitchMeasurements.stitchImage) {
+      formData.append("stitchImage", stitchMeasurements.stitchImage);
     }
+  }
+
+  formData.append("additionalInformation", data.additionalInformation);
+  formData.append("products", JSON.stringify(products));
 
     try {
       const response = await axios.post(
@@ -163,7 +139,7 @@ const Checkout = () => {
           },
         }
       );
-      console.log("Response", response);
+
       Swal.fire({
         title: "Success!",
         text: "Order placed successfully.",
@@ -175,7 +151,6 @@ const Checkout = () => {
           navigate("/");
         }
       });
-      // console.log("Order placed successfully:", response.data);
       dispatch(clearCart());
     } catch (error) {
       Swal.fire({
@@ -188,6 +163,14 @@ const Checkout = () => {
     }
   };
 
+  const handleStitchingChange = (cartItem, isChecked) => {
+    const updatedItems = cartItems.map(item =>
+      item._id === cartItem._id ? { ...item, isStitching: isChecked } : item
+    );
+    dispatch(setCartItems(updatedItems)); 
+  };
+
+  
   return (
     <Fragment>
       <SEO
@@ -430,59 +413,103 @@ const Checkout = () => {
                       )}
                     </div>
                   </div>
+                   <div className="col-lg-5">
+                  <div className="your-order-area">
+                    <h3>Your order</h3>
+                    <div className="your-order-wrap gray-bg-10" style={{ width: '100%' }}>
+                      <div className="your-order-product-info">
+                        <div className="your-order-top">
+                          <ul>
+                            <li>P.Name</li>
+                            <li>Stitching</li>
+                            <li>Total</li>
+                          </ul>
+                        </div>
+                        <div className="your-order-middle">
+                          <ul>
+                            {cartItems.map((cartItem, key) => {
+                              const discountedPrice = getDiscountPrice(cartItem.discountprice);
+                              const finalProductPrice = (
+                                cartItem.price * currency.currencyRate
+                              ).toFixed(2);
+                              const finalDiscountedPrice = (
+                                discountedPrice * currency.currencyRate
+                              ).toFixed(2);
 
-                  <div className="col-lg-5">
-                    <div className="your-order-area">
-                      <h3>Your order</h3>
-                      <div className="your-order-wrap gray-bg-4">
-                        <div className="your-order-product-info">
-                          <div className="your-order-top">
-                            <ul>
-                              <li>Product</li>
-                              <li>Total</li>
-                            </ul>
-                          </div>
-                          <div className="your-order-middle">
-                            <ul>
-                              {cartItems.map((cartItem, key) => {
-                                const discountedPrice = getDiscountPrice(
-                                  cartItem.discountprice
-                                );
-                                const finalProductPrice = (
-                                  cartItem.price * currency.currencyRate
-                                ).toFixed(2);
-                                const finalDiscountedPrice = (
-                                  discountedPrice * currency.currencyRate
-                                ).toFixed(2);
+                              // Base price calculation
+                              let totalItemPrice = discountedPrice != null
+                                ? finalDiscountedPrice * cartItem.quantity
+                                : finalProductPrice * cartItem.quantity;
 
-                                discountedPrice != null
-                                  ? (cartTotalPrice +=
-                                      finalDiscountedPrice * cartItem.quantity)
-                                  : (cartTotalPrice +=
-                                      finalProductPrice * cartItem.quantity);
-                                return (
-                                  <li key={key}>
-                                    <span className="order-middle-left">
-                                      {cartItem.name} X {cartItem.quantity}
-                                    </span>{" "}
-                                    <span className="order-price">
-                                      {discountedPrice !== null
-                                        ? currency.currencySymbol +
-                                          (
-                                            finalDiscountedPrice *
-                                            cartItem.quantity
-                                          ).toFixed(2)
-                                        : currency.currencySymbol +
-                                          (
-                                            finalProductPrice *
-                                            cartItem.quantity
-                                          ).toFixed(2)}
-                                    </span>
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          </div>
+                              const stitchingPrice = cartItem.stitchedPrice || 0;
+                              if (cartItem.isStitching) {
+                                totalItemPrice += stitchingPrice * cartItem.quantity;
+                              }
+
+                              cartTotalPrice += totalItemPrice;
+
+                              return (
+                                <li key={key}>
+                                  <span className="order-middle-left">
+                                    {cartItem.title} X {cartItem.quantity}
+                                  </span>
+
+                                  <div>
+                                    <label>
+                                      <input
+                                        type="checkbox" style={{width:'20px',height:'20px'}}
+                                        checked={cartItem.isStitching }
+                                        onChange={(e) =>
+                                          handleStitchingChange(cartItem, e.target.checked)
+                                        }
+                                      />
+                                      {" "}isStitching ({currency.currencySymbol}
+                                      {cartItem.stitchedPrice})
+                                    </label>
+                                  </div>
+                            
+                                  {cartItem.isStitching && (
+  <div>
+    <button
+      onClick={(e) => {
+        e.preventDefault(); // Prevent the form from submitting
+        navigate("/measurements");
+      }}
+      style={{
+        marginTop: '30px',
+        justifyContent: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        minWidth: '200px',
+        backgroundColor: "#007bff",
+        color: "#fff",
+        padding: "10px 15px", 
+        borderRadius: "5px",
+        border: "none",
+        cursor: "pointer",
+        transition: "background-color 0.3s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.backgroundColor = "#0056b3";
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.backgroundColor = "#007bff";
+      }}
+    >
+      For Measurements
+    </button>
+  </div>
+)}
+
+
+                                  <span className="order-price">
+                                    {currency.currencySymbol + totalItemPrice.toFixed(2)}
+                                  </span>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
                           <div className="your-order-bottom">
                             <ul>
                               <li className="your-order-shipping">Shipping</li>
@@ -511,14 +538,14 @@ const Checkout = () => {
                         </div>
                         <div className="payment-method"></div>
                       </div>
-                      <div className="place-order mt-25">
+                      {/* <div className="place-order mt-25">
                         <button
                           onClick={() => navigate("/measurements")}
                           className="btn-hover"
                         >
                           For Measurements
                         </button>
-                      </div>
+                      </div> */}
                       <div className="place-order mt-25">
                         <button type="submit" className="btn-hover">
                           Place Order

@@ -317,7 +317,7 @@ const Measurements = () => {
                         Upload Image
                       </Button>
                     </label>
-                    {formData.stitchImage && ( // Use image from formData
+                    {formData.stitchImage && (
                       <Box mt={2}>
                         <img
                           src={formData.stitchImage}

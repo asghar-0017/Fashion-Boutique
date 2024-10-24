@@ -400,6 +400,9 @@ const cartSlice = createSlice({
       //   position: "bottom-left",
       // });
     },
+    setCartItems(state, action) {
+      state.cartItems = action.payload;
+    }
   },
 });
 
@@ -408,7 +411,8 @@ export const {
   incrementQuantity,
   decreaseQuantity,
   deleteFromCart,
-  clearCart
+  clearCart,
+  setCartItems,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
