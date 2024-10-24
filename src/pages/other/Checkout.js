@@ -12,6 +12,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { MeasurementsContext } from "../../context/cardContext";
+import { Button } from "@mui/material";
+import { GiClothes } from "react-icons/gi";
 
 const getDiscountedPrice = (price, discount) => {
   if (price === undefined || price === null) return 0;
@@ -31,7 +33,7 @@ const Checkout = () => {
   const [measurementError, setMeasurementError] = useState(null); // For measurement errors
 
   let measurementsData = { ...formData };
-  
+
   let cartTotalPrice = 0;
   let { pathname } = useLocation();
   let navigate = useNavigate();
@@ -66,7 +68,10 @@ const Checkout = () => {
     }
 
     // Validate hipCircumference for shalwar
-    if (!measurementsData.shalwar || !measurementsData.shalwar.hipCircumference) {
+    if (
+      !measurementsData.shalwar ||
+      !measurementsData.shalwar.hipCircumference
+    ) {
       setMeasurementError("Hip Circumference for Shalwar is required.");
       return;
     }
@@ -105,29 +110,36 @@ const Checkout = () => {
     formData.append("phone", data.phone);
     formData.append("email", data.email);
 
-     // Add stitching data if applicable
-  if (measurementsData.customerName || measurementsData.height || measurementsData.weight) {
-    formData.append("isStitching", true);
+    // Add stitching data if applicable
+    if (
+      measurementsData.customerName ||
+      measurementsData.height ||
+      measurementsData.weight
+    ) {
+      formData.append("isStitching", true);
 
-    // Append all relevant measurements in a structured way
-    const stitchMeasurements = {
-      customerName: measurementsData.customerName || "",
-      height: measurementsData.height || 0,
-      weight: measurementsData.weight || 0,
-      kameez: measurementsData.kameez || {},
-      shalwar: measurementsData.shalwar || {},
-      fitPreferences: measurementsData.fitPreferences || {},
-      stitchImage: measurementsData.stitchImage instanceof File ? measurementsData.stitchImage : null,
-    };
+      // Append all relevant measurements in a structured way
+      const stitchMeasurements = {
+        customerName: measurementsData.customerName || "",
+        height: measurementsData.height || 0,
+        weight: measurementsData.weight || 0,
+        kameez: measurementsData.kameez || {},
+        shalwar: measurementsData.shalwar || {},
+        fitPreferences: measurementsData.fitPreferences || {},
+        stitchImage:
+          measurementsData.stitchImage instanceof File
+            ? measurementsData.stitchImage
+            : null,
+      };
 
-    formData.append("stretchData", JSON.stringify(stitchMeasurements));
-    if (stitchMeasurements.stitchImage) {
-      formData.append("stitchImage", stitchMeasurements.stitchImage);
+      formData.append("stretchData", JSON.stringify(stitchMeasurements));
+      if (stitchMeasurements.stitchImage) {
+        formData.append("stitchImage", stitchMeasurements.stitchImage);
+      }
     }
-  }
 
-  formData.append("additionalInformation", data.additionalInformation);
-  formData.append("products", JSON.stringify(products));
+    formData.append("additionalInformation", data.additionalInformation);
+    formData.append("products", JSON.stringify(products));
 
     try {
       const response = await axios.post(
@@ -164,13 +176,12 @@ const Checkout = () => {
   };
 
   const handleStitchingChange = (cartItem, isChecked) => {
-    const updatedItems = cartItems.map(item =>
+    const updatedItems = cartItems.map((item) =>
       item._id === cartItem._id ? { ...item, isStitching: isChecked } : item
     );
-    dispatch(setCartItems(updatedItems)); 
+    dispatch(setCartItems(updatedItems));
   };
 
-  
   return (
     <Fragment>
       <SEO
@@ -413,110 +424,122 @@ const Checkout = () => {
                       )}
                     </div>
                   </div>
-                   <div className="col-lg-5">
-                  <div className="your-order-area">
-                    <h3>Your order</h3>
-                    <div className="your-order-wrap gray-bg-10" style={{ width: '100%' }}>
-                      <div className="your-order-product-info">
-                        <div className="your-order-top">
-                          <ul>
-                            <li>P.Name</li>
-                            <li>Stitching</li>
-                            <li>Total</li>
-                          </ul>
-                        </div>
-                        <div className="your-order-middle">
-                          <ul>
-                            {cartItems.map((cartItem, key) => {
-                              const discountedPrice = getDiscountPrice(cartItem.discountprice);
-                              const finalProductPrice = (
-                                cartItem.price * currency.currencyRate
-                              ).toFixed(2);
-                              const finalDiscountedPrice = (
-                                discountedPrice * currency.currencyRate
-                              ).toFixed(2);
+                  <div className="col-lg-5">
+                    <div className="your-order-area">
+                      <h3>Your order</h3>
+                      <div
+                        className="your-order-wrap gray-bg-10"
+                        style={{ width: "100%" }}
+                      >
+                        <div className="your-order-product-info">
+                          <div className="your-order-top">
+                            <ul>
+                              <li>P.Name</li>
+                              <li>Stitching</li>
+                              <li>Total</li>
+                            </ul>
+                          </div>
+                          <div className="your-order-middle">
+                            <ul>
+                              {cartItems.map((cartItem, key) => {
+                                const discountedPrice = getDiscountPrice(
+                                  cartItem.discountprice
+                                );
+                                const finalProductPrice = (
+                                  cartItem.price * currency.currencyRate
+                                ).toFixed(2);
+                                const finalDiscountedPrice = (
+                                  discountedPrice * currency.currencyRate
+                                ).toFixed(2);
+                                let totalItemPrice =
+                                  discountedPrice != null
+                                    ? finalDiscountedPrice * cartItem.quantity
+                                    : finalProductPrice * cartItem.quantity;
 
-                              // Base price calculation
-                              let totalItemPrice = discountedPrice != null
-                                ? finalDiscountedPrice * cartItem.quantity
-                                : finalProductPrice * cartItem.quantity;
+                                const stitchingPrice =
+                                  cartItem.stitchedPrice || 0;
+                                if (cartItem.isStitching) {
+                                  totalItemPrice +=
+                                    stitchingPrice * cartItem.quantity;
+                                }
 
-                              const stitchingPrice = cartItem.stitchedPrice || 0;
-                              if (cartItem.isStitching) {
-                                totalItemPrice += stitchingPrice * cartItem.quantity;
-                              }
+                                cartTotalPrice += totalItemPrice;
 
-                              cartTotalPrice += totalItemPrice;
-
-                              return (
-                                <li key={key}>
-                                  <span className="order-middle-left">
-                                    {cartItem.title} X {cartItem.quantity}
-                                  </span>
-
-                                  <div>
-                                    <label>
-                                      <input
-                                        type="checkbox" style={{width:'20px',height:'20px'}}
-                                        checked={cartItem.isStitching }
-                                        onChange={(e) =>
-                                          handleStitchingChange(cartItem, e.target.checked)
+                                return (
+                                  <li
+                                    key={key}
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "space-between",
+                                      padding: "10px 0",
+                                    }}
+                                  >
+                                    <span className="order-middle-left">
+                                      {cartItem.title} X {cartItem.quantity}
+                                    </span>
+                                    {cartItem.isStitching && (
+                                      <FormControlLabel
+                                        control={
+                                          <Checkbox
+                                            checked={cartItem.isStitching}
+                                            onChange={(e) =>
+                                              handleStitchingChange(
+                                                cartItem,
+                                                e.target.checked
+                                              )
+                                            }
+                                            sx={{
+                                              width: "20px",
+                                              height: "20px",
+                                            }}
+                                          />
                                         }
+                                        label="Stitching"
+                                        sx={{ margin: "0 10px" }}
                                       />
-                                      {" "}isStitching ({currency.currencySymbol}
-                                      {cartItem.stitchedPrice})
-                                    </label>
-                                  </div>
-                            
-                                  {cartItem.isStitching && (
-  <div>
-    <button
-      onClick={(e) => {
-        e.preventDefault(); // Prevent the form from submitting
-        navigate("/measurements");
-      }}
-      style={{
-        marginTop: '30px',
-        justifyContent: 'center',
-        display: 'flex',
-        alignItems: 'center',
-        minWidth: '200px',
-        backgroundColor: "#007bff",
-        color: "#fff",
-        padding: "10px 15px", 
-        borderRadius: "5px",
-        border: "none",
-        cursor: "pointer",
-        transition: "background-color 0.3s ease",
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.backgroundColor = "#0056b3";
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.backgroundColor = "#007bff";
-      }}
-    >
-      For Measurements
-    </button>
-  </div>
-)}
+                                    )}
+                                    {cartItem.isStitching && (
+                                      <Button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          navigate("/measurements");
+                                        }}
+                                        sx={{
+                                          marginLeft: "10px",
+                                          minWidth: "40px",
+                                          minHeight: "40px",
+                                          backgroundColor: "transparent",
+                                          color: "#007bff",
+                                          padding: "0",
+                                          "&:hover": {
+                                            backgroundColor: "transparent",
+                                          },
+                                        }}
+                                      >
+                                        <GiClothes size={24} />
+                                      </Button>
+                                    )}
 
-
-                                  <span className="order-price">
-                                    {currency.currencySymbol + totalItemPrice.toFixed(2)}
-                                  </span>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
+                                    <span
+                                      className="order-price"
+                                      style={{ marginLeft: "auto" }}
+                                    >
+                                      {currency.currencySymbol +
+                                        totalItemPrice.toFixed(2)}
+                                    </span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
                           <div className="your-order-bottom">
                             <ul>
                               <li className="your-order-shipping">Shipping</li>
                               <li>Free shipping</li>
                             </ul>
                           </div>
-                          
+
                           {/* <div className="your-order-total">
                             <ul>
                               <li className="order-total">stitched Price</li>
